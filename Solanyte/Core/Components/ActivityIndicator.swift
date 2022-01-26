@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct ActivityIndicator: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
+  var body: some View {
+    ProgressView()
+      .progressViewStyle(CircularProgressViewStyle())
+  }
 }
 
 struct ActivityIndicator_Previews: PreviewProvider {
-    static var previews: some View {
-        ActivityIndicator()
-    }
+  static var previews: some View {
+    ActivityIndicator()
+  }
 }
