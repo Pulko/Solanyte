@@ -129,6 +129,13 @@ extension HomeView {
         .listRowBackground(Color.theme.background)
         .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))
       }
+
+      if vm.isListFull == false && coins.count > 0 {
+        ActivityIndicator()
+          .onAppear {
+            vm.fetchMore()
+          }
+      }
     }
     .listStyle(PlainListStyle())
   }

@@ -14,26 +14,43 @@ let solanaCoinDataUrl = "https://api.coingecko.com/api/v3/coins/markets?vs_curre
 
 class CoinDataService {
   @Published var allCoins: [CoinModel] = []
-  var coinSubscription: AnyCancellable?
+  private var coinSubscription: AnyCancellable?
+  private var currentPage: Int = 1
+  var perPage: Int = 100
   
   init() {
-    getCoins()
+    getCoins(coinDataUrl: coinDataUrl)
+  }
+  
+  private func getCoinDataUrl() -> String {
+    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=\(perPage)&page=\(self.currentPage)&sparkline=true&price_change_percentage=24h"
   }
   
   func reload() {
-    getCoins()
+    getCoins(coinDataUrl: coinDataUrl)
   }
   
-  private func getCoins() {
-    guard let url = URL(string: solanaCoinDataUrl) else { return }
+  func fetchMore() {
+    if allCoins.count == perPage * currentPage {
+      currentPage += 1
+    }
+    self.getCoins(coinDataUrl: getCoinDataUrl(), appending: true)
+  }
+  
+  private func getCoins(coinDataUrl: String, appending: Bool = false) {
+    guard let url = URL(string: coinDataUrl) else { return }
     
-    coinSubscription = NetworkingManager.download(url: url)
+    coinSubscription = NetworkingManager.download(url: url, onError: { self.currentPage -= 1 })
       .decode(type: [CoinModel].self, decoder: JSONDecoder())
       .receive(on: DispatchQueue.main)
       .sink(
         receiveCompletion: NetworkingManager.receiveCompletion,
         receiveValue: { [weak self] returnedCoins in
-          self?.allCoins = returnedCoins
+          if appending {
+            self?.allCoins.append(contentsOf: returnedCoins)
+          } else {
+            self?.allCoins = returnedCoins
+          }
           self?.coinSubscription?.cancel()
         })
   }

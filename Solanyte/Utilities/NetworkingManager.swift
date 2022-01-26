@@ -24,20 +24,24 @@ class NetworkingManager {
     }
   }
   
-  static func download(url: URL) -> AnyPublisher<Data, Error> {
+  static func download(url: URL, onError: ( () -> Void)? = nil) -> AnyPublisher<Data, Error> {
     return URLSession.shared.dataTaskPublisher(for: url)
 //      .subscribe(on: DispatchQueue.global(qos: .default)) goes to background thread automatically
-      .tryMap({ try self.handleUrlResponse(output: $0, url: url) })
+      .tryMap({ try self.handleUrlResponse(output: $0, url: url, onError: onError) })
 //      .receive(on: DispatchQueue.main) switch to main thread after decoding to not overwhelm
       .retry(3)
       .eraseToAnyPublisher()
   }
   
-  static func handleUrlResponse(output: URLSession.DataTaskPublisher.Output, url: URL) throws -> Data {
+  static func handleUrlResponse(output: URLSession.DataTaskPublisher.Output, url: URL, onError: ( () -> Void)? = nil) throws -> Data {
     guard let response = output.response as? HTTPURLResponse,
           response.statusCode >= 200 && response.statusCode < 300 else {
-      throw NetworkingError.badUrlResponse(url: url)
-    }
+            if let onError = onError {
+              onError()
+            }
+
+            throw NetworkingError.badUrlResponse(url: url)
+          }
     
     return output.data
   }

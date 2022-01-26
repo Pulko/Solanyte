@@ -27,6 +27,8 @@ class HomeViewModel: ObservableObject {
   private let coinDataService = CoinDataService()
   private var cancellables = Set<AnyCancellable>()
   
+  var isListFull: Bool = false
+  
   init() {
     addSubscribers()
   }
@@ -40,6 +42,10 @@ class HomeViewModel: ObservableObject {
       .map(filterAndSortCoins)
       .sink { [weak self] (allCoins) in
         self?.allCoins = allCoins  // updates all coins and triggers next subscriber
+        
+        if (allCoins.count % (self?.coinDataService.perPage)! > 0) {
+          self?.isListFull = true
+        }
       }
       .store(in: &cancellables)
 
@@ -74,6 +80,12 @@ class HomeViewModel: ObservableObject {
     isLoading = true
     coinDataService.reload()
     marketDataService.reload()
+    HapticManager.notification(type: .success)
+  }
+  
+  func fetchMore() {
+    isLoading = true
+    coinDataService.fetchMore()
     HapticManager.notification(type: .success)
   }
   
