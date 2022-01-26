@@ -40,7 +40,7 @@ struct HomeView: View {
         columnTitles
         
         if !showPortfolio {
-          renderCoins(coins: vm.allCoins, showHoldings: false)
+          renderCoins(coins: vm.allCoins, showHoldings: false, expanding: true)
             .transition(.move(edge: .leading))
         }
         
@@ -117,7 +117,7 @@ extension HomeView {
     .padding(.horizontal)
   }
   
-  private func renderCoins(coins: [CoinModel], showHoldings: Bool) -> some View {
+  private func renderCoins(coins: [CoinModel], showHoldings: Bool, expanding: Bool = false) -> some View {
     List {
       ForEach(coins) { coin in
         NavigationLink(
@@ -130,7 +130,7 @@ extension HomeView {
         .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))
       }
 
-      if vm.isListFull == false && coins.count > 0 {
+      if vm.isListFull == false && coins.count > 0 && expanding {
         ActivityIndicator()
           .onAppear {
             vm.fetchMore()
