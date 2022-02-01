@@ -88,18 +88,18 @@ class CoinModel: Identifiable, Codable {
     self.currentHoldings = currentHoldings
   }
   
-  init(coinDetailModel cdm: CoinDetailModel, currentHoldings: Double?) {
+  init(coinDetailModel cdm: CoinDetailModel, currentHoldings: Double? = 0) {
     self.id = cdm.id
     self.symbol = cdm.symbol
     self.name = cdm.name
     self.image = cdm.image?.thumb ?? ""
-    self.currentPrice = cdm.marketData.currentPrice?.first?.value
-    self.marketCap = cdm.marketData.marketCap?.first?.value
+    self.currentPrice = cdm.marketData.currentPrice?["usd"]
+    self.marketCap = cdm.marketData.marketCap?["usd"]
     self.marketCapRank = Double(cdm.marketData.marketCapRank ?? 0)
     self.fullyDilutedValuation = nil
     self.totalVolume = cdm.marketData.totalVolume?.first?.value
-    self.high24H = cdm.marketData.high24H?.first?.value
-    self.low24H = cdm.marketData.low24H?.first?.value
+    self.high24H = cdm.marketData.high24H?["usd"]
+    self.low24H = cdm.marketData.low24H?["usd"]
     self.priceChange24H = cdm.marketData.priceChange24H
     self.priceChangePercentage24H = cdm.marketData.priceChangePercentage24H
     self.marketCapChange24H = Double(cdm.marketData.marketCapChange24H ?? 0)
@@ -107,15 +107,15 @@ class CoinModel: Identifiable, Codable {
     self.circulatingSupply = cdm.marketData.circulatingSupply
     self.totalSupply = cdm.marketData.totalSupply
     self.maxSupply = 0.0
-    self.ath = cdm.marketData.ath?.first?.value
-    self.athChangePercentage = cdm.marketData.athChangePercentage?.first?.value
-    self.athDate = cdm.marketData.athDate?.first?.value
-    self.atl = cdm.marketData.atl?.first?.value
-    self.atlChangePercentage = cdm.marketData.atlChangePercentage?.first?.value
-    self.atlDate = cdm.marketData.atlDate?.first?.value
+    self.ath = cdm.marketData.ath?["usd"]
+    self.athChangePercentage = cdm.marketData.athChangePercentage?["usd"]
+    self.athDate = cdm.marketData.athDate?["usd"]
+    self.atl = cdm.marketData.atl?["usd"]
+    self.atlChangePercentage = cdm.marketData.atlChangePercentage?["usd"]
+    self.atlDate = cdm.marketData.atlDate?["usd"]
     self.lastUpdated = cdm.marketData.lastUpdated
     self.sparklineIn7D = SparklineIn7D(price: cdm.marketData.sparkline7D?.price ?? [])
-    self.priceChangePercentage24HInCurrency = cdm.marketData.priceChangePercentage24HInCurrency?.first?.value
+    self.priceChangePercentage24HInCurrency = cdm.marketData.priceChangePercentage24HInCurrency?["usd"]
     self.currentHoldings = currentHoldings
   }
   

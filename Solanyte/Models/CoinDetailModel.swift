@@ -145,7 +145,6 @@ struct Description: Codable {
 // MARK: - MarketData
 struct MarketData: Codable {
   let currentPrice: [String: Double]?
-//  let totalValueLocked, mcapToTvlRatio, fdvToTvlRatio, roi: NSNull
   let ath, athChangePercentage: [String: Double]?
   let athDate: [String: String]?
   let atl, atlChangePercentage: [String: Double]?
@@ -161,17 +160,12 @@ struct MarketData: Codable {
   let priceChangePercentage14DInCurrency, priceChangePercentage30DInCurrency, priceChangePercentage60DInCurrency, priceChangePercentage200DInCurrency: [String: Double]?
   let priceChangePercentage1YInCurrency, marketCapChange24HInCurrency, marketCapChangePercentage24HInCurrency: [String: Double]?
   let totalSupply: Double?
-//  let maxSupply: NSNull
   let circulatingSupply: Double?
   let sparkline7D: Sparkline7D?
   let lastUpdated: String?
   
   enum CodingKeys: String, CodingKey {
     case currentPrice = "current_price"
-//    case totalValueLocked = "total_value_locked"
-//    case mcapToTvlRatio = "mcap_to_tvl_ratio"
-//    case fdvToTvlRatio = "fdv_to_tvl_ratio"
-//    case roi
     case ath
     case athChangePercentage = "ath_change_percentage"
     case athDate = "ath_date"
@@ -180,7 +174,6 @@ struct MarketData: Codable {
     case atlDate = "atl_date"
     case marketCap = "market_cap"
     case marketCapRank = "market_cap_rank"
-//    case fullyDilutedValuation = "fully_diluted_valuation"
     case totalVolume = "total_volume"
     case high24H = "high_24h"
     case low24H = "low_24h"
@@ -206,7 +199,6 @@ struct MarketData: Codable {
     case marketCapChange24HInCurrency = "market_cap_change_24h_in_currency"
     case marketCapChangePercentage24HInCurrency = "market_cap_change_percentage_24h_in_currency"
     case totalSupply = "total_supply"
-//    case maxSupply = "max_supply"
     case circulatingSupply = "circulating_supply"
     case sparkline7D = "sparkline_7d"
     case lastUpdated = "last_updated"
