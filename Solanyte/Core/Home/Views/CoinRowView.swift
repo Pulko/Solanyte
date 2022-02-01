@@ -42,7 +42,7 @@ extension CoinRowView {
     CoinImageView(coin: coin)
       .frame(width: 40, height: 40)
   }
-
+  
   private var leftColumn: some View {
     HStack(spacing: 0) {
       Text("\(coin.rank)")
@@ -66,8 +66,8 @@ extension CoinRowView {
       Text(coin.priceChangePercentage24H?.asPercentString() ?? "")
         .foregroundColor(
           (coin.priceChangePercentage24H ?? 0) >= 0
-            ? .theme.green
-            : .theme.red
+          ? .theme.green
+          : .theme.red
         )
         .font(.caption2)
     }
@@ -78,7 +78,7 @@ extension CoinRowView {
     VStack(alignment: .trailing) {
       Text(coin.currentHoldingsValue.asCurrencyWith2Decimals())
         .bold()
-      Text((coin.currentHoldings ?? 0).asNumberString())
+      Text(Double(coin.currentHoldings ?? 0).asFloatWith4Decimals())
         .font(.caption2)
         .bold()
     }

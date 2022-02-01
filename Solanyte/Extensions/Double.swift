@@ -37,10 +37,34 @@ extension Double {
   /// ```
   func asCurrencyWith6Decimals() -> String {
     let number = NSNumber(value: self)
-
+    
     return currencyFormatter6.string(from: number) ?? "$0.00"
   }
   
+  /// Converts Double into a Floar number as a String with 4 decimal places
+  /// ```
+  /// Converts 1234.56 to "1,234.5600"
+  /// Converts 12.34562 to "12.3456"
+  /// Converts 0.123456 to "0.1234"
+  /// ```
+  func asFloatWith4Decimals() -> String {
+    let number = NSNumber(value: self)
+    
+    return holdingsFormatter.string(from: number) ?? "$0.0000"
+  }
+  
+  /// Converts Double into a Float with 4 decimal places
+  /// ```
+  /// Converts 12.3456234234 to 12.3456
+  /// ```
+  private var holdingsFormatter: NumberFormatter {
+    let formatter = NumberFormatter()
+    
+    formatter.minimumFractionDigits = 4
+    formatter.maximumFractionDigits = 4
+    
+    return formatter
+  }
   
   /// Converts Double into a Currency with 2-6 decimal places
   /// ```
@@ -67,7 +91,7 @@ extension Double {
   /// ```
   func asCurrencyWith2Decimals() -> String {
     let number = NSNumber(value: self)
-
+    
     return currencyFormatter2.string(from: number) ?? "$0.00"
   }
   
