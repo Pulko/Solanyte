@@ -9,13 +9,15 @@ import SwiftUI
 
 struct HomeView: View {
   @EnvironmentObject private var vm: HomeViewModel
-  @State private var showPortfolio: Bool = false // animate
   @State private var showPortfolioView: Bool = false // new sheet
-  
-  @State private var selectedCoin: CoinModel? = nil
-  @State private var showDetailView: Bool = false
-  
   @State private var showSettingsView: Bool = false
+  
+  private var isPortfolio: Bool {
+    vm.portfolioCoins.count > 0
+  }
+  private var coinsToRender: Array<CoinModel> {
+    vm.portfolioCoins
+  }
   
   var body: some View {
     ZStack {
@@ -29,31 +31,13 @@ struct HomeView: View {
       VStack {
         homeHeader
         
-        HomeStatsView(showPortfolio: $showPortfolio)
-        
-        HStack {
-          SearchBarView(searchText: $vm.searchText)
-            .padding(.leading)
-          updateButton
-        }
+        HomeStatsView()
+          .padding(.vertical)
         
         columnTitles
         
-        if !showPortfolio {
-          renderCoins(coins: vm.allCoins, showHoldings: false, expanding: true)
+        renderCoins(coins: coinsToRender, showHoldings: isPortfolio, expanding: !isPortfolio)
             .transition(.move(edge: .leading))
-        }
-        
-        if showPortfolio {
-          ZStack(alignment: .top) {
-            if vm.portfolioCoins.isEmpty && vm.searchText.isEmpty {
-              portfolioEmptytext
-            } else {
-              renderCoins(coins: vm.portfolioCoins, showHoldings: true)
-                .transition(.move(edge: .trailing))
-            }
-          }
-        }
         
         Spacer(minLength: 0)
       }
@@ -70,36 +54,19 @@ extension HomeView {
       .ignoresSafeArea()
   }
   
-  private var updateButton: some View {
-    Button(action: {
-      withAnimation(.linear(duration: 2)) {
-        vm.reloadData()
-      }
-    }, label: {
-      Image(systemName: "arrow.triangle.2.circlepath")
-    })
-    .rotationEffect(Angle.degrees(vm.isLoading ? 360 : 0), anchor: .center)
-    .padding(.trailing)
-    .padding(.trailing)
-  }
-  
   private var homeHeader: some View {
     HStack {
-      CircleButtonView(showPortfolio ? "plus" : "info") {
-        if showPortfolio {
-          showPortfolioView.toggle()
-        } else {
+      CircleButtonView("info") {
           showSettingsView.toggle()
-        }
       }
       .animation(.none)
       .background(
-        CircleButtonAnimationView(animate: $showPortfolio)
+        CircleButtonAnimationView(animate: .constant(true))
       )
       
       Spacer()
       
-      Text(showPortfolio ? "Portfolio" : "Live Prices")
+      Text("Solanyte")
         .font(.headline)
         .fontWeight(.heavy)
         .foregroundColor(.theme.accent)
@@ -107,12 +74,11 @@ extension HomeView {
       
       Spacer()
       
-      CircleButtonView("chevron.right") {
+      CircleButtonView("plus") {
         withAnimation(.spring()) {
-          showPortfolio.toggle()
+          showPortfolioView.toggle()
         }
       }
-      .rotationEffect(Angle(degrees: showPortfolio ? 180 : 0))
     }
     .padding(.horizontal)
   }
@@ -128,13 +94,6 @@ extension HomeView {
         )
         .listRowBackground(Color.theme.background)
         .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))
-      }
-
-      if vm.isListFull == false && coins.count > 0 && expanding {
-        ActivityIndicator()
-          .onAppear {
-            vm.fetchMore()
-          }
       }
     }
     .listStyle(PlainListStyle())
@@ -153,9 +112,7 @@ extension HomeView {
 
       Spacer()
 
-      if (showPortfolio) {
-        ColumnSortingTitle("Holdings", option: .holdings, optionReversed: .holdingsReversed)
-      }
+      ColumnSortingTitle("Holdings", option: .holdings, optionReversed: .holdingsReversed)
       
       ColumnSortingTitle("Price", option: .price, optionReversed: .priceReversed)
       .lastColumnStyled()

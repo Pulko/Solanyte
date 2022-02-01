@@ -10,7 +10,7 @@ import Combine
 
 class NetworkingManager {
   enum NetworkingError: LocalizedError {
-    case badUrlResponse(url: URL), unknown, badCoreDataResponse(error: Error)
+    case badUrlResponse(url: URL), unknown, badCoreDataResponse(error: Error), badResponse(error: Error)
     
     var errorDescription: String? {
       switch self {
@@ -18,6 +18,8 @@ class NetworkingManager {
         return "[🔥] Bad response from url: \(url)"
       case .badCoreDataResponse(error: let error):
         return "[⚡️] Error loading core data: \(error)"
+      case .badResponse(error: let error):
+        return "[⚡️] Error loading data: \(error)"
       case .unknown:
         return "[⚠️] Unknown error occured"
       }

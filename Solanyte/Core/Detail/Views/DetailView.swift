@@ -112,9 +112,6 @@ extension DetailView {
   private var toolbarItemContent: some View {
     HStack {
       HStack {
-        updateButton
-            .padding(.trailing)
-            .padding(.trailing)
         Text(vm.coin.symbol.uppercased())
           .font(.headline)
           .foregroundColor(.theme.secondaryText)

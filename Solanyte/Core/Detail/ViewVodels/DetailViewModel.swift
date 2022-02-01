@@ -40,7 +40,6 @@ class DetailViewModel: ObservableObject {
       .sink { [weak self] (returnedArrays: CoinDetailsStatisticsType) in
         self?.additionalStatistics = returnedArrays.additional
         self?.overviewStatistics = returnedArrays.overview
-        print(returnedArrays)
       }
       .store(in: &cancellables)
     
@@ -64,7 +63,7 @@ class DetailViewModel: ObservableObject {
   }
   
   private func createOverviewStatistics(coinModel: CoinModel) -> Array<StatisticModel> {
-    let price = coinModel.currentPrice.asCurrencyWith6Decimals()
+    let price = coinModel.currentPrice?.asCurrencyWith6Decimals() ?? "0.0"
     let priceChangePercentage = coinModel.priceChangePercentage24H
     let marketCap = "$ " + (coinModel.marketCap?.formattedWithAbbreviations() ?? "" )
     let marketCapChangePercentage = coinModel.marketCapChangePercentage24H

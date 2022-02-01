@@ -24,7 +24,7 @@ class CoinDetailDataService {
   }
   
   private func coinUrlById(_ coinId: String) -> String {
-    "https://api.coingecko.com/api/v3/coins/\(coinId)?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false&sparkline=false"
+    "https://api.coingecko.com/api/v3/coins/\(coinId)?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=true"
   }
   
   private func getCoinDetails(coinId: String) {

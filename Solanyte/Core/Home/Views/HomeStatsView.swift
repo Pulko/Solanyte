@@ -8,8 +8,21 @@
 import SwiftUI
 
 struct HomeStatsView: View {
-  @Binding var showPortfolio: Bool
   @EnvironmentObject private var vm: HomeViewModel
+  
+  private var updateButton: some View {
+    Button(action: {
+      withAnimation(.linear(duration: 2)) {
+        vm.reloadData()
+      }
+    }, label: {
+      Image(systemName: "arrow.triangle.2.circlepath")
+        .foregroundColor(.theme.secondaryText)
+    })
+    .rotationEffect(Angle.degrees(vm.isLoading ? 360 : 0), anchor: .center)
+    .padding()
+
+  }
   
   var body: some View {
     HStack {
@@ -17,14 +30,14 @@ struct HomeStatsView: View {
         StatisticView(stat: stat)
           .frame(width: UIScreen.main.bounds.width / 3)
       }
+      updateButton
     }
-    .frame(width: UIScreen.main.bounds.width, alignment: self.showPortfolio ? .trailing : .leading)
   }
 }
 
 struct HomeStatsView_Previews: PreviewProvider {
   static var previews: some View {
-    HomeStatsView(showPortfolio: .constant(false))
+    HomeStatsView()
       .environmentObject(dev.homeVM)
   }
 }

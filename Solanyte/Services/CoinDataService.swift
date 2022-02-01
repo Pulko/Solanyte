@@ -10,7 +10,7 @@ import Combine
 
 let coinDataUrl = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=24h"
 
-let solanaCoinDataUrl = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=solana-ecosystem&order=market_cap_desc&per_page=100&page=1&sparkline=true"
+let solanaCoinDataUrl = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=solana-ecosystem&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=24h"
 
 class CoinDataService {
   @Published var allCoins: [CoinModel] = []
@@ -22,12 +22,13 @@ class CoinDataService {
     getCoins(coinDataUrl: coinDataUrl)
   }
   
-  private func getCoinDataUrl() -> String {
-    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=\(perPage)&page=\(self.currentPage)&sparkline=true&price_change_percentage=24h"
+  private func getCoinDataUrl(ofSolana: Bool = false) -> String {
+    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&\(ofSolana ? "category=solana-ecosystem&" : "")order=market_cap_desc&per_page=\(perPage)&page=\(self.currentPage)&sparkline=true&price_change_percentage=24h"
   }
   
   func reload() {
     getCoins(coinDataUrl: coinDataUrl)
+    currentPage = 1
   }
   
   func fetchMore() {

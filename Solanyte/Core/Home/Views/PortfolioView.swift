@@ -5,7 +5,10 @@
 //  Created by Фёдор Ткаченко on 13.12.21.
 //
 
+// 5exSWLLQWC3zD5BGyFY8sRFQcRuv1dworDD5cgUwrXxD
+
 import SwiftUI
+import Solana
 
 struct PortfolioView: View {
   @EnvironmentObject private var vm: HomeViewModel
@@ -13,15 +16,15 @@ struct PortfolioView: View {
   
   @State private var selectedCoin: CoinModel? = nil
   @State private var quantity: String = ""
-  @State private var showSaveButton: Bool = false
   
   var body: some View {
     NavigationView {
-      ScrollView {
+      VStack {
         VStack(alignment: .leading, spacing: 0, content: {
-          HStack {
-            TextField("Solana wallet address", text: portfolioVm.$walletAddress)
+          if $portfolioVm.coins.count > 0 {
+            tokenList
           }
+          walletAddressInput
         })
       }
       .navigationTitle("Add wallet")
@@ -33,139 +36,75 @@ struct PortfolioView: View {
           trailingNavBarButtons
         }
       })
-      .onChange(of: vm.searchText, perform: { value in
-        if value == "" {
-          removeSelectedCoin()
-        }
-      })
       .background(Color.theme.background.ignoresSafeArea())
     }
   }
 }
 
 extension PortfolioView {
+  private var tokenList: some View {
+    List($portfolioVm.coins, id: \.id) {(each: Binding<CoinModel>) in
+      HStack {
+        Text(each.wrappedValue.symbol)
+        Spacer()
+        Text("\(each.wrappedValue.currentHoldings ?? 0)")
+      }
+    }
+  }
+  
+  private var walletAddressInput: some View {
+    VStack {
+      TextField("Solana wallet address", text: $portfolioVm.walletAddress)
+        .padding()
+      Button("Fetch wallet data") {
+        portfolioVm.fetchWalletByAddress()
+      }
+      
+      if (portfolioVm.isError) {
+        Text("⛔️ Incorrect address")
+          .foregroundColor(.theme.red)
+          .font(.footnote)
+          .padding()
+      }
+      
+      if (portfolioVm.isLoading) {
+        Text("📦 Loading...")
+          .foregroundColor(.theme.secondaryText)
+          .font(.footnote)
+          .padding()
+      }
+    }
+    .padding(.vertical)
+  }
+  
+  /* MARK: OLD EXTENSIONS */
+  
   private var coins: [CoinModel] {
-    vm.searchText.isEmpty ? (vm.portfolioCoins.isEmpty ? vm.allCoins : vm.portfolioCoins) : vm.allCoins
-  }
-
-//  private var coinLogoList: some View {
-//    ScrollView(.horizontal, showsIndicators: false, content: {
-//      LazyHStack(spacing: 10) {
-//        ForEach(coins) { coin in
-//          CoinLogoView(coin: coin)
-//            .frame(width: 75)
-//            .padding(8)
-//            .onTapGesture {
-//              withAnimation {
-//                updateSelectedCoin(coin: coin)
-//              }
-//            }
-//            .background(
-//              RoundedRectangle(cornerRadius: 10)
-//                .stroke(
-//                  selectedCoin?.id == coin.id ? Color.theme.green : Color.clear,
-//                  lineWidth: 1
-//                )
-//            )
-//        }
-//      }
-//      .frame(height: 130)
-//      .padding(.leading)
-//    })
-//  }
-  
-  private func updateSelectedCoin(coin: CoinModel) {
-    selectedCoin = coin
-    if let portfolioCoin = vm.portfolioCoins.first(where: { $0.id == coin.id }),
-       let amount = portfolioCoin.currentHoldings {
-      quantity = amount.asNumberString()
-    } else {
-      quantity = ""
-    }
-  }
-  
-  private var portfolioInputSection: some View {
-    VStack(spacing: 28) {
-      HStack {
-        Text("Current price of \(selectedCoin?.symbol.uppercased() ?? "")")
-        Spacer()
-        Text("\(selectedCoin?.currentPrice.asCurrencyWith6Decimals() ?? "")")
-      }
-      Divider()
-      HStack {
-        Text("Amount holding")
-        Spacer()
-        TextField("Ex. 1.4", text: $quantity)
-          .multilineTextAlignment(.trailing)
-          .keyboardType(.decimalPad)
-      }
-      Divider()
-      HStack {
-        Text("Current value")
-        Spacer()
-        Text(getCurrentValue().asCurrencyWith2Decimals())
-      }
-    }
-    .animation(.none)
-    .padding()
-    .font(.headline)
+    vm.portfolioCoins
   }
   
   private var trailingNavBarButtons: some View {
     HStack(spacing: 10) {
-        Button(action: {
-          saveButtonPressed()
-        }, label: {
-          Text("Save".uppercased())
-        })
-        .opacity(selectedCoin != nil && selectedCoin?.currentHoldings != Double(quantity) ? 1.0 : 0.0)
-        Image(systemName: "checkmark")
-          .opacity(showSaveButton ? 0.0 : 1.0)
-      
-      
+      Button(action: {
+        saveButtonPressed()
+      }, label: {
+        Text("Save".uppercased())
+      })
     }
     .font(.headline)
   }
   
   private func saveButtonPressed() {
-    guard
-      let coin = selectedCoin,
-      let amount = Double(quantity)
-    else { return }
-    
+    let tokensToSave = portfolioVm.coins
+
     // save to portfolio
-    vm.updatePortfolio(coin: coin, amount: amount)
-    
-    withAnimation(.easeIn) {
-      showSaveButton = true
-      removeSelectedCoin()
+    tokensToSave.forEach { coin in
+      vm.updatePortfolio(coin: coin, amount: coin.currentHoldings ?? 0.0)
     }
-    
+
     // hide keyboard
-    
+
     UIApplication.shared.endEditing()
-    
-    // hide checkmark
-    
-    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-      withAnimation(.easeOut) {
-        showSaveButton = false
-        quantity = ""
-      }
-    }
-  }
-  
-  private func removeSelectedCoin() {
-    selectedCoin = nil
-    vm.searchText = ""
-  }
-  
-  private func getCurrentValue() -> Double {
-    if let quantity = Double(quantity), let price = selectedCoin?.currentPrice {
-      return price * quantity
-    }
-    
-    return 0
   }
 }
 

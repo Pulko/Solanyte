@@ -38,14 +38,18 @@ struct CoinRowView_Previews: PreviewProvider {
 }
 
 extension CoinRowView {
+  private var coinImage: some View {
+    CoinImageView(coin: coin)
+      .frame(width: 40, height: 40)
+  }
+
   private var leftColumn: some View {
     HStack(spacing: 0) {
       Text("\(coin.rank)")
         .font(.caption)
         .foregroundColor(.theme.secondaryText)
         .padding(.trailing, 8)
-      CoinImageView(coin: coin)
-        .frame(width: 40, height: 40)
+      coinImage
       Text(coin.symbol.uppercased())
         .lineLimit(1)
         .font(.headline)
@@ -56,7 +60,7 @@ extension CoinRowView {
   
   private var rightColumn: some View {
     VStack(alignment: .trailing) {
-      Text(coin.currentPrice.asCurrencyWith6Decimals())
+      Text(coin.currentPrice?.asCurrencyWith6Decimals() ?? "0.0")
         .bold()
         .foregroundColor(.theme.accent)
       Text(coin.priceChangePercentage24H?.asPercentString() ?? "")
