@@ -12,27 +12,38 @@
 
 // MARK: - CoinModel
 class CoinModel: Identifiable, Codable {
-  let id, symbol, name: String
-  let image: String
-  let currentPrice: Double?
-  let marketCap, marketCapRank, fullyDilutedValuation: Double?
-  let totalVolume, high24H, low24H: Double?
-  let priceChange24H, priceChangePercentage24H, marketCapChange24H, marketCapChangePercentage24H: Double?
-  let circulatingSupply, totalSupply, maxSupply, ath: Double?
-  let athChangePercentage: Double?
-  let athDate: String?
-  let atl, atlChangePercentage: Double?
-  let atlDate: String?
-  let lastUpdated: String?
-  let sparklineIn7D: SparklineIn7D?
-  let priceChangePercentage24HInCurrency: Double?
-  let currentHoldings: Double?
+  var id, symbol, name: String
+  var image: String? = ""
+  var currentPrice: Double? = 0
+  var marketCap: Double? = 0
+  var marketCapRank: Double? = 0
+  var fullyDilutedValuation: Double? = 0
+  var totalVolume: Double? = 0
+  var high24H: Double? = 0
+  var low24H: Double? = 0
+  var marketCapChangePercentage24H: Double? = 0
+  var marketCapChange24H: Double? = 0
+  var priceChangePercentage24H: Double? = 0
+  var priceChange24H: Double? = 0
+  var ath: Double? = 0
+  var maxSupply: Double? = 0
+  var totalSupply: Double? = 0
+  var circulatingSupply: Double? = 0
+  var athChangePercentage: Double? = 0
+  var athDate: String? = ""
+  var atlChangePercentage: Double? = 0
+  var atl: Double? = 0
+  var atlDate: String? = ""
+  var lastUpdated: String? = ""
+  var sparklineIn7D: SparklineIn7D? = nil
+  var priceChangePercentage24HInCurrency: Double? = 0
+  var currentHoldings: Double? = 0
   
   init(
     id: String,
     symbol: String,
     name: String,
-    image: String,
+    image: String?,
     currentPrice: Double? = nil,
     marketCap: Double? = nil,
     marketCapRank: Double? = nil,
@@ -92,12 +103,12 @@ class CoinModel: Identifiable, Codable {
     self.id = cdm.id
     self.symbol = cdm.symbol
     self.name = cdm.name
-    self.image = cdm.image?.thumb ?? ""
+    self.image = cdm.image?.small ?? ""
     self.currentPrice = cdm.marketData.currentPrice?["usd"]
     self.marketCap = cdm.marketData.marketCap?["usd"]
     self.marketCapRank = Double(cdm.marketData.marketCapRank ?? 0)
     self.fullyDilutedValuation = nil
-    self.totalVolume = cdm.marketData.totalVolume?.first?.value
+    self.totalVolume = cdm.marketData.totalVolume?["usd"]
     self.high24H = cdm.marketData.high24H?["usd"]
     self.low24H = cdm.marketData.low24H?["usd"]
     self.priceChange24H = cdm.marketData.priceChange24H
@@ -162,7 +173,7 @@ class CoinModel: Identifiable, Codable {
 
 // MARK: - SparklineIn7D
 struct SparklineIn7D: Codable {
-  let price: [Double]?
+  var price: [Double]?
 }
 
 struct CoinModelFactory {

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ChartView: View {
   @State private var animationPercentage: CGFloat = 0
-
+  
   private let data: [Double]
   private let minY: Double
   private let maxY: Double
@@ -17,19 +17,19 @@ struct ChartView: View {
   
   private let startingDate: Date
   private let endingDate: Date
-
-  init(coin: CoinModel) {
-    data = coin.sparklineIn7D?.price ?? []
+  
+  init(sparkline: SparklineIn7D?, lastUpdated: String?) {
+    data = sparkline?.price ?? []
     minY = data.min() ?? 0
     maxY = data.max() ?? 0
     
     let priceChange = ((data.last ?? 0) - (data.first ?? 0))
     lineColor = priceChange > 0 ? .green : .red
-
-    startingDate = Date(coinGeckoString: coin.lastUpdated ?? "")
+    
+    startingDate = Date(coinGeckoString: lastUpdated ?? "")
     endingDate = startingDate.addingTimeInterval(7*24*60*60)
   }
-
+  
   var body: some View {
     VStack {
       chartView
@@ -52,7 +52,7 @@ struct ChartView: View {
 
 struct ChartView_Previews: PreviewProvider {
   static var previews: some View {
-    ChartView(coin: dev.coin)
+    ChartView(sparkline: dev.coin.sparklineIn7D, lastUpdated: dev.coin.lastUpdated)
   }
 }
 

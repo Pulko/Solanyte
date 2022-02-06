@@ -14,14 +14,6 @@ class WalletService {
   
   private let solanaApiService = SolanaApiService()
   
-  private func tokenDataByMint(_ mintAddress: String) -> URL {
-    URL(string: "https://public-api.solscan.io/token/meta?tokenAddress=\(mintAddress)")!
-  }
-  
-  private func coinDataByCoingeckoId(_ id: String) -> URL {
-    URL(string: "https://api.coingecko.com/api/v3/coins/\(id)")!
-  }
-  
   @Published var wallets: Array<Wallet> = [] {
     didSet {
       self.getTokens()
@@ -36,7 +28,7 @@ class WalletService {
   }
   
   @Published var coins: Array<CoinModel> = []
-  
+  @Published var walletValue: Double = 0
   
   init(pubkey: String) {
     self.getTokenWallets(walletPublicKey: pubkey)
@@ -62,7 +54,7 @@ class WalletService {
   }
   
   private func fetchTokenDataByMint(mint: PublicKey, amount: TokenAmount?) -> Void {
-    NetworkingManager.download(url: self.tokenDataByMint(mint.base58EncodedString))
+    NetworkingManager.download(url: CoingeckoApiService.url.tokenDataByMint(mint.base58EncodedString))
       .decode(type: TokenData.self, decoder: JSONDecoder())
       .receive(on: DispatchQueue.main)
       .sink(
@@ -78,42 +70,38 @@ class WalletService {
       self.tokens
         .compactMap { $0 }
         .forEach { (token: TokenData) in
-        if let coingeckoID = token.coingeckoID {
-          self.fetchCoinDataByCoingeckoId(id: coingeckoID, amount: token.amount)
-        } else {
-          if token.symbol != nil {
-            self.coins.append(
-              CoinModelFactory.custom(
-                id: token.symbol!,
-                symbol: token.symbol!,
-                name: token.name ?? "n/a",
-                currentHoldings: Double(token.amount?.uiAmountString ?? "0") ?? 0.0,
-                image: token.icon ?? ""
-              )
-            )
+          if let coingeckoID = token.coingeckoID {
+            self.fetchCoinDataByCoingeckoId(id: coingeckoID, amount: token.amount)
+          } else {
+            self.appendCustomCoinData(token: token)
           }
         }
-      }
+    }
+  }
+  
+  private func appendCustomCoinData(token: TokenData) -> Void {
+    if let symbol = token.symbol {
+      self.coins.append(
+        CoinModelFactory.custom(
+          id: symbol,
+          symbol: symbol,
+          name: token.name ?? "n/a",
+          currentHoldings: Double(token.amount?.uiAmountString ?? "0") ?? 0.0,
+          image: token.icon ?? ""
+        )
+      )
     }
   }
   
   private func fetchCoinDataByCoingeckoId(id: String, amount: TokenAmount?) -> Void {
-    NetworkingManager.download(url: self.coinDataByCoingeckoId(id))
-      .decode(type: CoinDetailModel.self, decoder: JSONDecoder())
-      .tryMap({ (coinDetailModel: CoinDetailModel) -> CoinModel in
-        return CoinModel(coinDetailModel: coinDetailModel, currentHoldings: Double(amount?.uiAmountString ?? "0"))
-      })
-      .receive(on: DispatchQueue.main)
-      .sink(receiveCompletion: { completion in
-        switch completion {
-        case .failure(let error):
-          print(NetworkingManager.NetworkingError.badResponse(error: error))
-        case .finished:
-          print("Fetched correctly")
-        }
-      }, receiveValue: { [weak self] coinModel in
+    CoingeckoApiService.fetchCoinDetailById(
+      id: id,
+      amount: Double(amount?.uiAmountString ?? "0") ?? 0.0,
+      tryMap: { CoinModel(coinDetailModel: $0) },
+      receiveValue: { [weak self] coinModel in
         if let uiAmount = amount?.uiAmountString {
           self?.coins.append(coinModel.updateHoldings(amount: Double(uiAmount)!))
+          self?.walletValue += Double(uiAmount) ?? 0
         } else {
           self?.coins.append(coinModel)
         }

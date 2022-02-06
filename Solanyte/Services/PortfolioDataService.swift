@@ -44,26 +44,25 @@ class PortfolioDataService {
     }
   }
   
-  func reload() -> Void {
-    self.savedEntities.forEach { container.viewContext.delete($0) }
-    self.applyChanges()
+  func deleteAll() -> Void {
+    savedEntities.forEach { container.viewContext.delete($0) }
+    savedEntities.removeAll()
+    savedCoins.removeAll()
+    self.save()
   }
   
+  func reload() -> Void {
+    self.getPortfolio()
+  }
   
   // MARK: Private
   private func getPortfolio() -> Void {
     let request = NSFetchRequest<PortfolioEntity>(entityName: entityName)
-
+    
     do {
       savedEntities = try container.viewContext.fetch(request)
-
-      savedEntities
-        .uniqued()
-        .forEach { (entity: PortfolioEntity) in
-        if let id = entity.coinID {
-          self.fetchCoinDataByCoingeckoId(id: id, amount: entity.amount)
-        }
-      }
+      
+      self.handleSavedEntities()
     } catch let error {
       print(NetworkingManager.NetworkingError.badCoreDataResponse(error: error))
     }
@@ -100,25 +99,24 @@ class PortfolioDataService {
     applyChanges()
   }
   
-  private func coinDataByCoingeckoId(_ id: String) -> URL {
-    URL(string: "https://api.coingecko.com/api/v3/coins/\(id)?sparkline=true")!
+  // MARK: fetch data
+  
+  private func handleSavedEntities() -> Void {
+    self.savedEntities
+      .uniqued()
+      .forEach { (entity: PortfolioEntity) in
+        if let id = entity.coinID {
+          self.fetchCoinDataByCoingeckoId(id: id, amount: entity.amount)
+        }
+      }
   }
   
   private func fetchCoinDataByCoingeckoId(id: String, amount: Double?) -> Void {
-    NetworkingManager.download(url: self.coinDataByCoingeckoId(id))
-      .decode(type: CoinDetailModel.self, decoder: JSONDecoder())
-      .tryMap({ (coinDetailModel: CoinDetailModel) -> CoinModel in
-        return CoinModel(coinDetailModel: coinDetailModel, currentHoldings: amount)
-      })
-      .receive(on: DispatchQueue.main)
-      .sink(receiveCompletion: { completion in
-        switch completion {
-        case .failure(let error):
-          print(NetworkingManager.NetworkingError.badResponse(error: error))
-        case .finished:
-          print("Fetched from core data correctly")
-        }
-      }, receiveValue: { [weak self] coinModel in
+    CoingeckoApiService.fetchCoinDetailById(
+      id: id,
+      amount: amount ?? 0.0,
+      tryMap: { CoinModel(coinDetailModel: $0, currentHoldings: amount) },
+      receiveValue: { [weak self] coinModel in
         self?.savedCoins.append(coinModel)
       })
       .store(in: &self.cancellables)

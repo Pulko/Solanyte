@@ -19,18 +19,28 @@ struct HomeStatsView: View {
       Image(systemName: "arrow.triangle.2.circlepath")
         .foregroundColor(.theme.secondaryText)
     })
-    .rotationEffect(Angle.degrees(vm.isLoading ? 360 : 0), anchor: .center)
-    .padding()
-
+      .rotationEffect(Angle.degrees(vm.isLoading ? 360 : 0), anchor: .center)
+  }
+  
+  private var clearButton: some View {
+    Button(action: {
+      withAnimation() {
+        vm.removeData()
+      }
+    }, label: {
+      Image(systemName: "trash")
+        .foregroundColor(.theme.secondaryText)
+    })
+    
   }
   
   var body: some View {
-    HStack {
-      ForEach(vm.statistics) { stat in
-        StatisticView(stat: stat)
-          .frame(width: UIScreen.main.bounds.width / 3)
-      }
+    HStack() {
+      clearButton
+        .padding()
+      
       updateButton
+        .padding()
     }
   }
 }

@@ -20,16 +20,16 @@ struct DetailView: View {
   var body: some View {
     ScrollView {
       VStack {
-        ChartView(coin: vm.coin)
+        ChartView(sparkline: vm.chart, lastUpdated: vm.coin.lastUpdated)
           .padding(.vertical)
       }
       VStack(spacing: 20) {
         descriptionSection
         
-        self.getSectionTitleitle("Overview", systemName: "square.fill.text.grid.1x2")
+        self.getSectionTitleitle("Overview")
         self.getStatisticsGrid(stats: vm.overviewStatistics)
         
-        self.getSectionTitleitle("Additional Details", systemName: "square.fill.text.grid.1x2")
+        self.getSectionTitleitle("Additional Details")
         self.getStatisticsGrid(stats: vm.additionalStatistics)
         
         
@@ -46,7 +46,6 @@ struct DetailView: View {
       }
       .padding()
     }
-    .navigationTitle(vm.coin.name)
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
         toolbarItemContent
@@ -65,17 +64,12 @@ extension DetailView {
     ]
   }
   
-  private func getSectionTitleitle(_ text: String, systemName: String? = nil) -> some View {
+  private func getSectionTitleitle(_ text: String) -> some View {
     VStack {
       HStack {
         Text(text)
           .bold()
-          .font(.title)
-        
-        if let name = systemName {
-          Image(systemName: name)
-            .font(.title3)
-        }
+          .font(.title3)
       }
       .foregroundColor(.theme.accent)
       .frame( maxWidth: .infinity, alignment: .leading)
@@ -105,37 +99,27 @@ extension DetailView {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
       })
-      .padding(.top)
+        .padding(.top)
     }
   }
   
   private var toolbarItemContent: some View {
     HStack {
       HStack {
-        Text(vm.coin.symbol.uppercased())
-          .font(.headline)
-          .foregroundColor(.theme.secondaryText)
+        Text(vm.coin.name)
+          .fontWeight(.bold)
+          .font(.title)
+          .foregroundColor(.theme.accent)
       }
       CoinImageView(coin: vm.coin)
         .frame(width: 25, height: 25)
     }
   }
   
-  private var updateButton: some View {
-    Button(action: {
-      withAnimation(.linear(duration: 2)) {
-        vm.reloadData()
-      }
-    }, label: {
-      Image(systemName: "arrow.triangle.2.circlepath")
-        .rotationEffect(Angle.degrees(vm.isLoading ? 360 : 0), anchor: .center)
-    })      
-  }
-  
   private var descriptionSection: some View {
     VStack {
       if let description = vm.coinDescription, !description.isEmpty {
-        self.getSectionTitleitle("Description", systemName: "info.circle")
+        self.getSectionTitleitle("Description")
         VStack(alignment: .leading) {
           Text(description)
             .lineLimit(showFullDescription ? nil : 3)

@@ -23,13 +23,8 @@ class CoinDetailDataService {
     getCoinDetails(coinId: coin.id)
   }
   
-  private func coinUrlById(_ coinId: String) -> String {
-    "https://api.coingecko.com/api/v3/coins/\(coinId)?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=true"
-  }
-  
   private func getCoinDetails(coinId: String) {
-    guard let url = URL(string: coinUrlById(coinId)) else { return }
-    
+    let url = CoingeckoApiService.url.coinDetailById(coinId)
     coinDetailsSubscription = NetworkingManager.download(url: url)
       .decode(type: CoinDetailModel.self, decoder: JSONDecoder())
       .receive(on: DispatchQueue.main)

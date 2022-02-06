@@ -15,7 +15,9 @@ class DetailViewModel: ObservableObject {
   @Published var coinDescription: String? = nil
   @Published var websiteUrl: String? = nil
   @Published var redditUrl: String? = nil
-  @Published var isLoading: Bool = false
+  
+  @Published var chart: SparklineIn7D? = nil
+  @Published var lastUpdated: String = ""
   
   private let coinDetailsDataService: CoinDetailDataService
   private var cancellables = Set<AnyCancellable>()
@@ -27,11 +29,6 @@ class DetailViewModel: ObservableObject {
   }
   
   typealias CoinDetailsStatisticsType = (overview: Array<StatisticModel>, additional: Array<StatisticModel>)
-  
-  func reloadData() {
-    self.isLoading = true
-    coinDetailsDataService.reload()
-  }
   
   private func addSubscribers() {
     coinDetailsDataService.$coinDetails
@@ -50,7 +47,8 @@ class DetailViewModel: ObservableObject {
         self.coinDescription = details.readableDescription
         self.redditUrl = details.links?.subredditURL
         self.websiteUrl = details.links?.homepage?.first
-        self.isLoading = false
+        self.chart = SparklineIn7D(price: details.marketData.sparkline7D?.price)
+        self.lastUpdated = details.marketData.lastUpdated ?? ""
       }
       .store(in: &cancellables)
   }

@@ -9,11 +9,12 @@ import SwiftUI
 
 struct HomeView: View {
   @EnvironmentObject private var vm: HomeViewModel
-  @State private var showPortfolioView: Bool = false // new sheet
+  
+  @State private var showPortfolioView: Bool = false
   @State private var showSettingsView: Bool = false
   
-  private var isPortfolio: Bool {
-    vm.portfolioCoins.count > 0
+  private var isContent: Bool {
+    coinsToRender.count > 0
   }
   private var coinsToRender: Array<CoinModel> {
     vm.portfolioCoins
@@ -29,15 +30,31 @@ struct HomeView: View {
         })
       // content
       VStack {
-        homeHeader
         
-        HomeStatsView()
-          .padding(.vertical)
+        VStack {
+          homeHeader
+          
+          if isContent {
+            withAnimation {
+              HomeStatsView()
+                .padding(.bottom)
+            }
+          }
+        }
+        .background(Color.theme.container)
+        .cornerRadius(CGFloat(20))
+        .padding()
         
-        columnTitles
         
-        renderCoins(coins: coinsToRender, showHoldings: isPortfolio, expanding: !isPortfolio)
+        if isContent {
+          columnTitles
+          
+          renderCoins(coins: coinsToRender, showHoldings: true)
             .transition(.move(edge: .leading))
+        } else {
+          portfolioEmptytext
+        }
+        
         
         Spacer(minLength: 0)
       }
@@ -56,34 +73,33 @@ extension HomeView {
   
   private var homeHeader: some View {
     HStack {
-      CircleButtonView("info") {
-          showSettingsView.toggle()
+      CircleButtonView("line.3.horizontal") {
+        showSettingsView.toggle()
       }
       .animation(.none)
-      .background(
-        CircleButtonAnimationView(animate: .constant(true))
-      )
       
       Spacer()
       
-      Text("Solanyte")
-        .font(.headline)
+      Text(isContent ? vm.portfolioValue.asCurrencyWith2Decimals() : "Solanyte")
+        .font(.title)
         .fontWeight(.heavy)
         .foregroundColor(.theme.accent)
         .animation(.none)
       
       Spacer()
       
-      CircleButtonView("plus") {
+      CircleButtonView(
+        isContent ? "checkmark" : "plus"
+      ) {
         withAnimation(.spring()) {
           showPortfolioView.toggle()
         }
       }
     }
-    .padding(.horizontal)
+    .padding()
   }
   
-  private func renderCoins(coins: [CoinModel], showHoldings: Bool, expanding: Bool = false) -> some View {
+  private func renderCoins(coins: [CoinModel], showHoldings: Bool) -> some View {
     List {
       ForEach(coins) { coin in
         NavigationLink(
@@ -92,30 +108,30 @@ extension HomeView {
             CoinRowView(coin: coin, showHoldings: showHoldings)
           }
         )
-        .listRowBackground(Color.theme.background)
-        .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))
+          .listRowBackground(Color.theme.background)
+          .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))
       }
     }
     .listStyle(PlainListStyle())
   }
   
   private var portfolioEmptytext: some View {
-    Text("No coins, add using ＋ button 👍")
+    Text("Tap + to get wallet token balance")
       .font(.callout)
       .foregroundColor(.theme.accent)
       .padding(50)
   }
-
+  
   private var columnTitles: some View {
     HStack{
       ColumnSortingTitle("Coin", option: .rank, optionReversed: .rankReversed)
-
+      
       Spacer()
-
+      
       ColumnSortingTitle("Holdings", option: .holdings, optionReversed: .holdingsReversed)
       
       ColumnSortingTitle("Price", option: .price, optionReversed: .priceReversed)
-      .lastColumnStyled()
+        .lastColumnStyled()
     }
     .font(.caption)
     .foregroundColor(.theme.secondaryText)

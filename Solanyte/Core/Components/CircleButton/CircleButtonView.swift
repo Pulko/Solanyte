@@ -11,21 +11,31 @@ struct CircleButtonView: View {
   let iconName: String
   let action: () -> Void
   
-  init(_ iconName: String, action: @escaping (() -> Void) = {}) {
+  var width: Double
+  var height: Double
+  
+  init(
+    _ iconName: String,
+    width: Double = 50,
+    height: Double = 50,
+    action: @escaping (() -> Void) = {}
+  ) {
     self.iconName = iconName
     self.action = action
+    self.width = width
+    self.height = height
   }
   
   var body: some View {
     Image(systemName: iconName)
       .foregroundColor(.theme.accent)
       .font(.headline)
-      .frame(width: 50, height: 50, alignment: .center)
+      .frame(width: width, height: height, alignment: .center)
       .background(
-        Circle()
+        Rectangle()
           .foregroundColor(.theme.secondaryText.opacity(0.1))
+          .cornerRadius(CGFloat(20))
       )
-      .padding()
       .onTapGesture(perform: action)
   }
 }

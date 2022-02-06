@@ -102,7 +102,7 @@ import Foundation
 // MARK: - CoinDetailModel
 struct CoinDetailModel: Identifiable, Codable {
   let id, symbol, name: String
-  let blockTimeInMinutes: Int
+  let blockTimeInMinutes: Int?
   let hashingAlgorithm: String?
   let description: Description?
   let links: Links?
@@ -151,10 +151,11 @@ struct MarketData: Codable {
   let atlDate: [String: String]?
   let marketCap: [String: Double]?
   let marketCapRank: Int?
-  let totalVolume, high24H, low24H: [String: Double]?
+  let totalVolume: [String: Double]?
+  let high24H, low24H: [String: Double]?
   let priceChange24H, priceChangePercentage24H, priceChangePercentage7D, priceChangePercentage14D: Double?
   let priceChangePercentage30D, priceChangePercentage60D, priceChangePercentage200D, priceChangePercentage1Y: Double?
-  let marketCapChange24H: Int?
+  let marketCapChange24H: Double?
   let marketCapChangePercentage24H: Double?
   let priceChange24HInCurrency, priceChangePercentage1HInCurrency, priceChangePercentage24HInCurrency, priceChangePercentage7DInCurrency: [String: Double]?
   let priceChangePercentage14DInCurrency, priceChangePercentage30DInCurrency, priceChangePercentage60DInCurrency, priceChangePercentage200DInCurrency: [String: Double]?
@@ -207,5 +208,5 @@ struct MarketData: Codable {
 
 // MARK: - Sparkline7D
 struct Sparkline7D: Codable {
-  let price: [Double]
+  let price: [Double]?
 }

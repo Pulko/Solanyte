@@ -15,12 +15,14 @@ enum SortOption {
 }
 
 class HomeViewModel: ObservableObject {
-  @Published var portfolioCoins: [CoinModel] = []
   @Published var isLoading: Bool = false
-  @Published var statistics: [StatisticModel] = []
+  @Published var isError: Bool = false
+  
+  @Published var portfolioCoins: [CoinModel] = []
+  @Published var portfolioValue: Double = 0
+  @Published var sortOption: SortOption = .rank
   
   private let portfolioDataService = PortfolioDataService()
-  private let marketDataService = MarketDataService()
   private var cancellables = Set<AnyCancellable>()
   
   var isListFull: Bool = false
@@ -32,19 +34,22 @@ class HomeViewModel: ObservableObject {
   func addSubscribers() {
     // update portfolio coins
     portfolioDataService.$savedCoins
-      .sink { [weak self] (returnedCoins) in
-        self?.portfolioCoins = returnedCoins.uniqued() // updates portfolio coins and triggers next subscriber
-        self?.isLoading = false // once coins are update, loading is over
+      .combineLatest($sortOption)
+      .map(filterAndSortCoins)
+      .sink { [weak self] (returnedCoins: [CoinModel]) in
+        
+        self?.portfolioCoins = returnedCoins.uniqued()
       }
       .store(in: &cancellables)
-
-    // updates market data and portfolio
-    marketDataService.$marketData
-      .combineLatest($portfolioCoins)
-      .map(mapGlobalMarketData)
-      .sink { [weak self] (statistics) in
-        self?.statistics = statistics // updates statistics
-        self?.isLoading = false // once stats are update, loading is over
+    
+    
+    $portfolioCoins
+      .sink { [weak self] (coins: [CoinModel]) in
+        self?.portfolioValue = coins.reduce(0) { $0 + $1.currentHoldingsValue }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+          self?.isLoading = false
+        }
       }
       .store(in: &cancellables)
   }
@@ -55,25 +60,48 @@ class HomeViewModel: ObservableObject {
   
   func reloadData() {
     isLoading = true
-    marketDataService.reload()
     portfolioDataService.reload()
     HapticManager.notification(type: .success)
   }
   
-  private func mapGlobalMarketData(marketDataModel: MarketDataModel?, portfolioCoins: [CoinModel]) -> [StatisticModel] {
-    var stats: [StatisticModel] = []
+  func removeData() {
+    isLoading = true
+    portfolioDataService.deleteAll()
+    HapticManager.notification(type: .success)
+  }
+  
+  private func filterAndSortCoins(coins: [CoinModel], sort: SortOption) -> [CoinModel] {
+    var cloneCoins = coins
     
-    guard let data = marketDataModel else { return stats }
-    
-    let marketCap = StatisticModel(title: "Market Cap", value: data.marketCap, percentChange: data.marketCapChangePercentage24HUsd)
-    let volume = StatisticModel(title: "Volume", value: data.volume)
-    
-    stats.append(contentsOf: [
-      marketCap,
-      volume,
-    ])
-    
-    return stats
+    sortCoins(coins: &cloneCoins, sort: sort)
+    return cloneCoins
+  }
+  
+  private func sortCoins(coins: inout [CoinModel], sort: SortOption) {
+    switch sort {
+    case .price:
+      coins.sort {
+        if let first = $0.currentPrice, let second = $1.currentPrice {
+          return first > second
+        }
+        return false
+      }
+    case .priceReversed:
+      coins.sort {
+        if let first = $0.currentPrice, let second = $1.currentPrice {
+          return first < second
+        }
+        return false
+      }
+    case .rank:
+      coins.sort { $0.rank > $1.rank }
+    case .rankReversed:
+      coins.sort { $0.rank < $1.rank }
+    case .holdings:
+      coins.sort { $0.currentHoldingsValue > $1.currentHoldingsValue }
+    case .holdingsReversed:
+      coins.sort { $0.currentHoldingsValue < $1.currentHoldingsValue }
+    }
   }
 }
 

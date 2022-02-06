@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ColumnSortingTitle: View {
   @EnvironmentObject private var vm: HomeViewModel
-
+  
   var text: String
   var option: SortOption
   var optionReversed: SortOption
@@ -20,26 +20,26 @@ struct ColumnSortingTitle: View {
     self.optionReversed = optionReversed
   }
   
-//  var arrowOpacity: Double {
-//    vm.sortOption == option || vm.sortOption == optionReversed ? 1 : 0
-//  }
-//
-//  var rotationAngle: Angle {
-//    Angle(degrees: vm.sortOption == optionReversed ? 180 : 0)
-//  }
-
+  var arrowOpacity: Double {
+    vm.sortOption == option || vm.sortOption == optionReversed ? 1 : 0
+  }
+  
+  var rotationAngle: Angle {
+    Angle(degrees: vm.sortOption == optionReversed ? 180 : 0)
+  }
+  
   var body: some View {
     HStack(spacing: 4) {
       Text(text)
-//      Image(systemName: "chevron.down")
-//        .opacity(arrowOpacity)
-//        .rotationEffect(rotationAngle)
+      Image(systemName: "chevron.down")
+        .opacity(arrowOpacity)
+        .rotationEffect(rotationAngle)
     }
-//    .onTapGesture {
-//      withAnimation {
-//        vm.sortOption = (vm.sortOption == option ? optionReversed : option)
-//      }
-//    }
+    .onTapGesture {
+      withAnimation {
+        vm.sortOption = (vm.sortOption == option ? optionReversed : option)
+      }
+    }
   }
 }
 

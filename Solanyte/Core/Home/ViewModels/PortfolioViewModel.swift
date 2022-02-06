@@ -10,8 +10,14 @@ import Combine
 import Solana
 
 class PortfolioViewModel: ObservableObject {
-  @Published var isError: Bool = false
   @Published var isLoading: Bool = false
+  @Published var isError: Bool = false
+  @Published var isReady: Bool = false
+  
+  @Published var walletAddress: String = ""
+  @Published var wallets: Array<Wallet> = []
+  @Published var coins: Array<CoinModel> = []
+  @Published var walletValue: Double = 0
   
   private var cancellables = Set<AnyCancellable>()
   
@@ -26,6 +32,7 @@ class PortfolioViewModel: ObservableObject {
       walletService = WalletService(pubkey: self.walletAddress)
       addSubscribers()
     } else {
+      self.isLoading = false
       self.isError = true
     }
   }
@@ -36,17 +43,14 @@ class PortfolioViewModel: ObservableObject {
     return isLengthPassed
   }
   
-  @Published var walletAddress: String = ""
-  @Published var wallets: Array<Wallet> = []
-  @Published var coins: Array<CoinModel> = []
-  
-  
   private func addSubscribers() {
     if let walletService = walletService {
       walletService.$wallets
         .receive(on: DispatchQueue.main)
         .sink { [weak self] (returnedWallets: Array<Wallet>) in
           self?.wallets = returnedWallets
+          
+          self?.isLoading = false
           self?.isError = false
         }
         .store(in: &cancellables)
@@ -55,8 +59,20 @@ class PortfolioViewModel: ObservableObject {
         .receive(on: DispatchQueue.main)
         .sink { [weak self] (returnedCoins: Array<CoinModel>) in
           self?.coins = returnedCoins.uniqued()
+          
           self?.isLoading = false
           self?.isError = false
+        }
+        .store(in: &cancellables)
+      
+      walletService.$walletValue
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] returnedWalletValue in
+          self?.walletValue = returnedWalletValue
+          
+          self?.isLoading = false
+          self?.isError = false
+          self?.isReady = true
         }
         .store(in: &cancellables)
     }

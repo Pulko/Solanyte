@@ -76,11 +76,13 @@ extension CoinRowView {
   
   private var centralColumn: some View {
     VStack(alignment: .trailing) {
-      Text(coin.currentHoldingsValue.asCurrencyWith2Decimals())
-        .bold()
-      Text(Double(coin.currentHoldings ?? 0).asFloatWith4Decimals())
-        .font(.caption2)
-        .bold()
+      if coin.currentHoldingsValue > 0 {
+        Text(coin.currentHoldingsValue.asCurrencyWith2Decimals())
+          .bold()
+        Text(Double(coin.currentHoldings ?? 0).asFloatWith4Decimals())
+          .font(.caption2)
+          .bold()
+      }
     }
     .foregroundColor(.theme.accent)
   }
