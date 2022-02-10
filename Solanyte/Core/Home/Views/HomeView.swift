@@ -30,7 +30,6 @@ struct HomeView: View {
         })
       // content
       VStack {
-        
         VStack {
           homeHeader
           
@@ -73,7 +72,7 @@ extension HomeView {
   
   private var homeHeader: some View {
     HStack {
-      CircleButtonView("line.3.horizontal") {
+      CircleButtonView("ellipsis") {
         showSettingsView.toggle()
       }
       .animation(.none)
@@ -92,9 +91,12 @@ extension HomeView {
         isContent ? "checkmark" : "plus"
       ) {
         withAnimation(.spring()) {
-          showPortfolioView.toggle()
+          if !isContent {
+            showPortfolioView.toggle()
+          }
         }
       }
+      .colorMultiply(isContent ? .theme.green : .theme.accent)
     }
     .padding()
   }

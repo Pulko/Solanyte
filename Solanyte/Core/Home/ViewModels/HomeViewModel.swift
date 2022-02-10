@@ -20,7 +20,7 @@ class HomeViewModel: ObservableObject {
   
   @Published var portfolioCoins: [CoinModel] = []
   @Published var portfolioValue: Double = 0
-  @Published var sortOption: SortOption = .rank
+  @Published var sortOption: SortOption = .holdings
   
   private let portfolioDataService = PortfolioDataService()
   private var cancellables = Set<AnyCancellable>()
