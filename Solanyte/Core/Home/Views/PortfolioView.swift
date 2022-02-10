@@ -37,12 +37,11 @@ struct PortfolioView: View {
         
       }
       .navigationTitle("Add wallet")
-      .toolbar(content: {
+      .toolbar {
         ToolbarItem(placement: .navigationBarLeading) {
           XmarkButton()
         }
-      })
-      .background(Color.theme.background.ignoresSafeArea())
+      }
     }
   }
 }
@@ -124,12 +123,6 @@ extension PortfolioView {
         Spacer()
         Text("\(portfolioVm.coins.count)")
       }
-      Divider()
-      HStack {
-        Text("Portfolio value:")
-        Spacer()
-        Text(portfolioVm.walletValue.asCurrencyWith2Decimals())
-      }
     }
   }
   
@@ -148,5 +141,6 @@ struct PortfolioView_Previews: PreviewProvider {
   static var previews: some View {
     PortfolioView()
       .environmentObject(dev.homeVM)
+      .preferredColorScheme(.dark)
   }
 }
