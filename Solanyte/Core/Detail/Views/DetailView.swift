@@ -19,18 +19,18 @@ struct DetailView: View {
   
   var body: some View {
     ScrollView {
-      VStack {
-        ChartView(sparkline: vm.chart, lastUpdated: vm.coin.lastUpdated)
-          .padding(.vertical)
+      if (vm.chart?.price ?? []).count > 0 {
+        VStack {
+          ChartView(sparkline: vm.chart, lastUpdated: vm.coin.lastUpdated)
+            .padding(.vertical)
+        }
       }
+      
       VStack(spacing: 20) {
         descriptionSection
         
-        self.getSectionTitleitle("Overview")
-        self.getStatisticsGrid(stats: vm.overviewStatistics)
-        
-        self.getSectionTitleitle("Additional Details")
-        self.getStatisticsGrid(stats: vm.additionalStatistics)
+        self.getSectionTitleitle("Statistics")
+        self.getStatisticsGrid(stats: vm.statistics)
         
         
         if let redditUrl = vm.redditUrl,
@@ -106,6 +106,10 @@ extension DetailView {
   private var toolbarItemContent: some View {
     HStack {
       HStack {
+        Text(String(vm.coin.rank))
+          .fontWeight(.bold)
+          .font(.title2)
+          .foregroundColor(.theme.secondaryText)
         Text(vm.coin.name)
           .fontWeight(.bold)
           .font(.title)
@@ -133,6 +137,7 @@ extension DetailView {
             }
           }, label: {
             Text(showFullDescription ? "Read less" : "Read more")
+              .font(.caption)
               .foregroundColor(.theme.accent)
               .padding(.vertical, 4)
           })
