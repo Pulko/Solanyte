@@ -8,31 +8,26 @@
 import SwiftUI
 
 struct SettingsView: View {
-  private let youtubeUrl: URL = URL(string: "https://www.youtube.com/channel/UCp25X4LzOLaksp5qY0YMUzg")!
-  private let coingeckoUrl: URL = URL(string: "https://www.coingecko.com/")!
-  private let personalUrl: URL = URL(string: "https://github.com/pulko")!
+  @StateObject var vm: SettingsViewModel = SettingsViewModel()
   
   var body: some View {
     NavigationView {
-      ZStack {
-        List {
-          siftThinkingSection
-            .listRowBackground(Color.theme.background.opacity(0.5))
+      VStack {
+        VStack(alignment: .center) {
+          Spacer()
+          courseSection
+          Spacer()
           coingeckoSection
-            .listRowBackground(Color.theme.background.opacity(0.5))
+          Spacer()
           developerSection
-            .listRowBackground(Color.theme.background.opacity(0.5))
-          // applicationService
         }
       }
       .listStyle(GroupedListStyle())
-      .navigationTitle("Settings")
       .toolbar {
         ToolbarItem(placement: .navigationBarLeading) {
           XmarkButton()
         }
       }
-      .background(Color.theme.background.ignoresSafeArea())
     }
   }
 }
@@ -40,57 +35,69 @@ struct SettingsView: View {
 struct SettingsView_Previews: PreviewProvider {
   static var previews: some View {
     SettingsView()
+      .preferredColorScheme(.dark)
   }
 }
 
 extension SettingsView {
-  private var developerSection: some View {
-    Section(header: Text("Developer")) {
-      VStack(alignment: .leading) {
-        Text("Made by Pulko 🥸")
+  private var coingeckoSection: some View {
+    VStack {
+      HStack(spacing: 0) {
+        Text("Powered by ")
+          .font(.callout)
+          .foregroundColor(.theme.secondaryText)
+          .fontWeight(.medium)
+          .padding(.vertical)
+        
+        Text("Coingecko")
           .font(.callout)
           .foregroundColor(.theme.accent)
           .fontWeight(.medium)
           .padding(.vertical)
+          .onTapGesture {
+            UIApplication.shared.open(vm.coingeckoUrl, options: [:])
+          }
       }
-      Link("Github 💾", destination: personalUrl)
-        .foregroundColor(.blue)
+      Image("coingecko")
+        .resizable()
+        .scaledToFit()
+        .frame(height: 30)
     }
   }
   
-  private var coingeckoSection: some View {
-    Section(header: Text("CoinGecko")) {
-      VStack(alignment: .leading) {
-        Image("coingecko")
-          .resizable()
-          .scaledToFit()
-          .frame(height: 100)
-        Text("All cryptocurrency data is coming from Coingecko")
-          .font(.callout)
-          .foregroundColor(.theme.accent)
-          .fontWeight(.medium)
-          .padding(.vertical)
-      }
-      Link("CoinGecko website 🦎", destination: coingeckoUrl)
-        .foregroundColor(.blue)
+  private var courseSection: some View {
+    VStack(spacing: 0) {
+      Text("This app was made with help of ")
+        .font(.callout)
+        .foregroundColor(.theme.secondaryText)
+        .fontWeight(.medium)
+      Text("Swift Thinking Course")
+        .font(.callout)
+        .foregroundColor(.theme.accent)
+        .fontWeight(.medium)
+        .onTapGesture {
+          UIApplication.shared.open(vm.youtubeUrl, options: [:])
+        }
     }
   }
-
-  private var siftThinkingSection: some View {
-    Section(header: Text("Swift Thinking")) {
-      VStack(alignment: .leading) {
-        Image("logo")
-          .resizable()
-          .frame(width: 120, height: 120)
-          .clipShape(RoundedRectangle(cornerRadius: 25.0))
-        Text("This app was made by Swift Thinking Course")
-          .font(.callout)
-          .foregroundColor(.theme.accent)
-          .fontWeight(.medium)
-          .padding(.vertical)
-      }
-      Link("YouTube channel 🎥", destination: youtubeUrl)
-        .foregroundColor(.blue)
+  
+  
+  
+  private var developerSection: some View {
+    HStack(spacing: 0) {
+      Text("Made by ")
+        .font(.callout)
+        .foregroundColor(.theme.secondaryText)
+        .fontWeight(.medium)
+        .padding(.vertical)
+      Text("Pulko 🥸")
+        .font(.callout)
+        .foregroundColor(.theme.accent)
+        .fontWeight(.medium)
+        .padding(.vertical)
+        .onTapGesture {
+          UIApplication.shared.open(vm.personalUrl, options: [:])
+        }
     }
   }
 }
