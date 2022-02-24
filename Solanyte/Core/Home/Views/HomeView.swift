@@ -16,6 +16,7 @@ struct HomeView: View {
   private var isContent: Bool {
     coinsToRender.count > 0
   }
+
   private var coinsToRender: Array<CoinModel> {
     vm.portfolioCoins
   }

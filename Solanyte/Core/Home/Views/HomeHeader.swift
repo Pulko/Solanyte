@@ -12,18 +12,23 @@ struct HomeHeader: View {
   @Binding var showSettingsView: Bool
   @Binding var showPortfolioView: Bool
   
+  private var coinsToRender: Array<CoinModel> {
+    vm.portfolioCoins
+  }
+  
   private var isContent: Bool {
     coinsToRender.count > 0
   }
-  private var coinsToRender: Array<CoinModel> {
-    vm.portfolioCoins
+
+  private var fromWallet: Bool {
+    vm.fromWallet
   }
   
   var body: some View {
     VStack {
       navigation
       
-      if isContent {
+      if fromWallet {
         withAnimation {
           HStack {
             hideZeroBalance
@@ -81,12 +86,12 @@ extension HomeHeader {
       Spacer()
       
       VStack {
-        Text(isContent ? vm.portfolioValue.asCurrencyWith2Decimals() : "Solanyte")
+        Text(fromWallet ? vm.portfolioValue.asCurrencyWith2Decimals() : "Solanyte")
           .font(.title)
           .fontWeight(.heavy)
           .foregroundColor(.theme.accent)
           .animation(.none)
-        if (isContent) {
+        if (fromWallet) {
           Text(vm.walletEntity?.key ?? "")
             .foregroundColor(.theme.accent)
             .frame(width: 100)
@@ -97,9 +102,9 @@ extension HomeHeader {
       
       Spacer()
       
-      CircleButtonView(isContent ? "trash" : "plus") {
+      CircleButtonView(fromWallet ? "trash" : "plus") {
         withAnimation(.spring()) {
-          if isContent {
+          if fromWallet {
             vm.removeData()
           } else {
             showPortfolioView.toggle()

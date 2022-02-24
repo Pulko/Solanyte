@@ -16,6 +16,7 @@ enum SortOption {
 
 class HomeViewModel: ObservableObject {
   @Published var isLoading: Bool = false
+  @Published var fromWallet: Bool = false
   
   @Published var portfolioCoins: [CoinModel] = []
   @Published var walletEntity: WalletEntity? = nil
@@ -46,6 +47,12 @@ class HomeViewModel: ObservableObject {
         if let returnedWallet = returnedWallet {
           self?.walletEntity = returnedWallet
         }
+      }
+      .store(in: &cancellables)
+    
+    portfolioDataService.$fromWallet
+      .sink { [weak self] (fromWallet: Bool) in
+        self?.fromWallet = fromWallet
       }
       .store(in: &cancellables)
     
