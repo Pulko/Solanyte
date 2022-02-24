@@ -34,6 +34,7 @@ struct PortfolioView: View {
           }
         })
           .padding(30)
+          .shadow(color: .theme.container, radius: 20, x: 0, y: 0)
         
       }
       .navigationTitle("Add wallet")
@@ -146,6 +147,5 @@ struct PortfolioView_Previews: PreviewProvider {
   static var previews: some View {
     PortfolioView()
       .environmentObject(dev.homeVM)
-      .preferredColorScheme(.dark)
   }
 }

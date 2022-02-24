@@ -34,6 +34,7 @@ struct HomeView: View {
           showSettingsView: $showSettingsView,
           showPortfolioView: $showPortfolioView
         )
+          .shadow(color: .theme.container, radius: 20, x: 0, y: 0)
         
         if isContent {
           columnTitles
