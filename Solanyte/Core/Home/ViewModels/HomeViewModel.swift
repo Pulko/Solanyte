@@ -15,7 +15,6 @@ enum SortOption {
 }
 
 class HomeViewModel: ObservableObject {
-  @State private var isWalletBalanceUpdated: Bool = false
   @Published var isLoading: Bool = false
   
   @Published var portfolioCoins: [CoinModel] = []

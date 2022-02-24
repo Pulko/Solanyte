@@ -80,6 +80,7 @@ class PortfolioDataService {
   }
   
   // MARK: Private
+  
   private func getPortfolio() -> Void {
     let request = NSFetchRequest<PortfolioEntity>(entityName: portfolioEntityName)
     let walletRequest = NSFetchRequest<WalletEntity>(entityName: walletEntityName)
@@ -94,18 +95,15 @@ class PortfolioDataService {
     }
   }
   
-  private func add(coin: CoinModel, amount: Double) -> Void {
-    let entity = PortfolioEntity(context: container.viewContext)
-    entity.coinID = coin.id
-    entity.amount = amount
-    
-    applyChanges()
+  private func save(container: NSPersistentContainer) {
+    do {
+      try container.viewContext.save()
+    } catch let error {
+      print("Error saving to core data: \(error)")
+    }
   }
   
-  private func update(entity: PortfolioEntity, amount: Double) {
-    entity.amount = amount
-    applyChanges()
-  }
+  // Wallet
   
   private func updateWalletEntity(entity: WalletEntity, balance: Double, key: String) {
     entity.balance = balance
@@ -121,12 +119,19 @@ class PortfolioDataService {
     save(container: walletContainer)
   }
   
-  private func save(container: NSPersistentContainer) {
-    do {
-      try container.viewContext.save()
-    } catch let error {
-      print("Error saving to core data: \(error)")
-    }
+  // Portfolio
+  
+  private func add(coin: CoinModel, amount: Double) -> Void {
+    let entity = PortfolioEntity(context: container.viewContext)
+    entity.coinID = coin.id
+    entity.amount = amount
+    
+    applyChanges()
+  }
+  
+  private func update(entity: PortfolioEntity, amount: Double) {
+    entity.amount = amount
+    applyChanges()
   }
   
   private func applyChanges() {

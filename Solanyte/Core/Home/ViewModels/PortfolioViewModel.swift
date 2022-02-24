@@ -29,6 +29,7 @@ class PortfolioViewModel: ObservableObject {
       self.isLoading = true
       
       walletService = WalletService(pubkey: self.walletAddress)
+      HapticManager.notification(type: .success)
       addSubscribers()
     } else {
       self.isLoading = false
