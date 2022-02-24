@@ -15,7 +15,6 @@ class PortfolioViewModel: ObservableObject {
   @Published var isReady: Bool = false
   
   @Published var walletAddress: String = ""
-  @Published var wallets: Array<Wallet> = []
   @Published var coins: Array<CoinModel> = []
   @Published var walletValue: Double = 0
   
@@ -47,21 +46,18 @@ class PortfolioViewModel: ObservableObject {
     if let walletService = walletService {
       walletService.$wallets
         .receive(on: DispatchQueue.main)
-        .sink { [weak self] (returnedWallets: Array<Wallet>) in
-          self?.wallets = returnedWallets
-          
-          self?.isLoading = false
-          self?.isError = false
-        }
+        .sink { walletService.getTokens(wallets: $0) }
+        .store(in: &cancellables)
+      
+      walletService.$tokens
+        .receive(on: DispatchQueue.main)
+        .sink { walletService.getCoins(tokens: $0) }
         .store(in: &cancellables)
       
       walletService.$coins
         .receive(on: DispatchQueue.main)
         .sink { [weak self] (returnedCoins: Array<CoinModel>) in
-          self?.coins = returnedCoins.uniqued()
-          
-          self?.isLoading = false
-          self?.isError = false
+          self?.coins = returnedCoins
         }
         .store(in: &cancellables)
       

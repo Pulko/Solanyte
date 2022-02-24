@@ -24,12 +24,13 @@ class CoingeckoApiService {
       URL(string: "https://api.coingecko.com/api/v3/coins/\(id)?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=true")!
     }
     
-    func tokenDataByMint(_ mint: String) -> URL {
-      URL(string: "https://public-api.solscan.io/token/meta?tokenAddress=\(mint)")!
+    func coinModelsByIds(_ ids: Array<String>) -> URL {
+      URL(string: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=\(ids.joined(separator: ","))&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=7d")!
     }
   }
   
   static var url = CoingeckoUrl()
+  static var solanaId = "solana"
   
   static func fetchCoinDetailById(
     id: String,
@@ -39,6 +40,21 @@ class CoingeckoApiService {
   ) -> AnyCancellable {
     return NetworkingManager.download(url: url.coinDetailById(id))
       .decode(type: CoinDetailModel.self, decoder: JSONDecoder())
+      .tryMap(tryMap)
+      .receive(on: DispatchQueue.main)
+      .sink(
+        receiveCompletion: self.receive,
+        receiveValue: receiveValue
+      )
+  }
+  
+  static func fetchCoinModelsByIds(
+    ids: Array<String>,
+    tryMap: @escaping ([CoinModel]) -> [CoinModel],
+    receiveValue: @escaping ([CoinModel]) -> Void
+  ) -> AnyCancellable {
+    return NetworkingManager.download(url: url.coinModelsByIds(ids))
+      .decode(type: Array<CoinModel>.self, decoder: JSONDecoder())
       .tryMap(tryMap)
       .receive(on: DispatchQueue.main)
       .sink(

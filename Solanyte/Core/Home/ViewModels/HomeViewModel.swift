@@ -15,17 +15,18 @@ enum SortOption {
 }
 
 class HomeViewModel: ObservableObject {
+  @State private var isWalletBalanceUpdated: Bool = false
   @Published var isLoading: Bool = false
-  @Published var isError: Bool = false
   
   @Published var portfolioCoins: [CoinModel] = []
+  @Published var walletEntity: WalletEntity? = nil
   @Published var portfolioValue: Double = 0
+  
+  @Published var isAboveZero: Bool = false
   @Published var sortOption: SortOption = .holdings
   
   private let portfolioDataService = PortfolioDataService()
   private var cancellables = Set<AnyCancellable>()
-  
-  var isListFull: Bool = false
   
   init() {
     addSubscribers()
@@ -34,14 +35,20 @@ class HomeViewModel: ObservableObject {
   func addSubscribers() {
     // update portfolio coins
     portfolioDataService.$savedCoins
-      .combineLatest($sortOption)
+      .combineLatest($sortOption, $isAboveZero)
       .map(filterAndSortCoins)
       .sink { [weak self] (returnedCoins: [CoinModel]) in
-        
         self?.portfolioCoins = returnedCoins.uniqued()
       }
       .store(in: &cancellables)
     
+    portfolioDataService.$savedWallet
+      .sink { [weak self] (returnedWallet: WalletEntity?) in
+        if let returnedWallet = returnedWallet {
+          self?.walletEntity = returnedWallet
+        }
+      }
+      .store(in: &cancellables)
     
     $portfolioCoins
       .sink { [weak self] (coins: [CoinModel]) in
@@ -58,6 +65,10 @@ class HomeViewModel: ObservableObject {
     portfolioDataService.updatePortfolio(coin: coin, amount: amount)
   }
   
+  func updateWallet(key: String) {
+    portfolioDataService.updateWallet(key: key, balance: 0)
+  }
+  
   func reloadData() {
     isLoading = true
     portfolioDataService.reload()
@@ -70,11 +81,18 @@ class HomeViewModel: ObservableObject {
     HapticManager.notification(type: .success)
   }
   
-  private func filterAndSortCoins(coins: [CoinModel], sort: SortOption) -> [CoinModel] {
+  private func filterAndSortCoins(coins: [CoinModel], sort: SortOption, filter: Bool) -> [CoinModel] {
     var cloneCoins = coins
     
+    filterCoins(coins: &cloneCoins, filter: filter)
     sortCoins(coins: &cloneCoins, sort: sort)
     return cloneCoins
+  }
+  
+  private func filterCoins(coins: inout [CoinModel], filter: Bool) {
+    if (filter) {
+      coins = coins.filter { $0.currentHoldingsValue > 0 }
+    }
   }
   
   private func sortCoins(coins: inout [CoinModel], sort: SortOption) {

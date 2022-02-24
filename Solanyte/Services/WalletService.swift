@@ -13,99 +13,82 @@ class WalletService {
   private var cancellables = Set<AnyCancellable>()
   
   private let solanaApiService = SolanaApiService()
+  private var solanaBalance: Double = 0
   
-  @Published var wallets: Array<Wallet> = [] {
-    didSet {
-      self.getTokens()
-    }
-  }
-  @Published var tokens: Array<TokenData> = [] {
-    didSet {
-      if oldValue.count == self.wallets.count - 1 {
-        self.getCoins()
-      }
-    }
-  }
-  
+  @Published var wallets: Array<Wallet> = []
+  @Published var tokens: Array<TokenData> = []
   @Published var coins: Array<CoinModel> = []
+
   @Published var walletValue: Double = 0
   
   init(pubkey: String) {
-    self.getTokenWallets(walletPublicKey: pubkey)
+    self.getWallets(walletPublicKey: pubkey)
+    self.getBalance(walletPublicKey: pubkey)
   }
   
-  func getTokenWallets(walletPublicKey: String) -> Void {
+  private func getWallets(walletPublicKey: String) -> Void {
     solanaApiService.actions.getTokenWallets(account: walletPublicKey) { (result: Result<[Wallet], Error>) in
-      SolanaApiService.handleResult(result, errorText: "Unable to perform an action") { (wallets: [Wallet]) -> Void in
+      SolanaApiService.handleResult(result, errorText: "Unable to get wallets from Solana API") { (wallets: [Wallet]) -> Void in
         self.wallets = wallets
       }
     }
   }
   
-  func getTokens() -> Void {
-    if self.wallets.count > 0 {
-      self.wallets.forEach { (wallet: Wallet) in
+  private func getBalance(walletPublicKey: String) -> Void {
+    solanaApiService.api.getBalance(account: walletPublicKey, commitment: nil) { (result: Result<UInt64, Error>) in
+      SolanaApiService.handleResult(result, errorText: "Unable to get balance from Solana API") { (balance: UInt64) -> Void in
+        self.solanaBalance = Double(balance) * SolanaApiService.lamport
+      }
+    }
+  }
+  
+  func getTokens(wallets: Array<Wallet> = []) -> Void {
+    if wallets.count > 0 {
+      wallets.forEach { (wallet: Wallet) in
         if let address = wallet.token?.address,
            let mint = PublicKey(string: address) {
-          self.fetchTokenDataByMint(mint: mint, amount: wallet.ammount)
+          
+          SolscanApiService.fetchTokenDataByMint(
+            mint: mint,
+            amount: wallet.ammount,
+            receiveValue: { [weak self] tokenData in
+              self?.tokens.append(tokenData.assignAmount(amount: wallet.ammount))
+            })
+            .store(in: &self.cancellables)
         }
       }
     }
   }
   
-  private func fetchTokenDataByMint(mint: PublicKey, amount: TokenAmount?) -> Void {
-    NetworkingManager.download(url: CoingeckoApiService.url.tokenDataByMint(mint.base58EncodedString))
-      .decode(type: TokenData.self, decoder: JSONDecoder())
-      .receive(on: DispatchQueue.main)
-      .sink(
-        receiveCompletion: NetworkingManager.receiveCompletion,
-        receiveValue: { [weak self] tokenData in
-          self?.tokens.append(tokenData.assignAmount(amount: amount))
-        })
-      .store(in: &self.cancellables)
-  }
-  
-  func getCoins() -> Void {
-    if self.tokens.count > 0 {
-      self.tokens
-        .compactMap { $0 }
-        .forEach { (token: TokenData) in
-          if let coingeckoID = token.coingeckoID {
-            self.fetchCoinDataByCoingeckoId(id: coingeckoID, amount: token.amount)
+  func getCoins(tokens: Array<TokenData> = []) -> Void {
+    if tokens.count > 0 {
+      var ids = tokens.uniqued().compactMap { $0.coingeckoID }
+      ids.append(CoingeckoApiService.solanaId)
+      
+      let tryMap = { (models: [CoinModel]) -> [CoinModel] in
+        models.map { (model: CoinModel) in
+          let found = tokens.first(where: { $0.coingeckoID == model.id })
+          var amount: Double = 0.0
+
+          if (model.id == CoingeckoApiService.solanaId) {
+            amount = self.solanaBalance
           } else {
-            self.appendCustomCoinData(token: token)
+            amount = Double(found?.amount?.uiAmountString ?? "0") ?? 0.0
           }
+          
+          self.walletValue += amount
+
+          return model.updateHoldings(amount: amount)
         }
+      }
+      
+      CoingeckoApiService.fetchCoinModelsByIds(
+        ids: ids,
+        tryMap: tryMap,
+        receiveValue: { [weak self] coinModels in
+          self?.coins = coinModels
+        })
+        .store(in: &self.cancellables)
     }
-  }
-  
-  private func appendCustomCoinData(token: TokenData) -> Void {
-    if let symbol = token.symbol {
-      self.coins.append(
-        CoinModelFactory.custom(
-          id: symbol,
-          symbol: symbol,
-          name: token.name ?? "n/a",
-          currentHoldings: Double(token.amount?.uiAmountString ?? "0") ?? 0.0,
-          image: token.icon ?? ""
-        )
-      )
-    }
-  }
-  
-  private func fetchCoinDataByCoingeckoId(id: String, amount: TokenAmount?) -> Void {
-    CoingeckoApiService.fetchCoinDetailById(
-      id: id,
-      amount: Double(amount?.uiAmountString ?? "0") ?? 0.0,
-      tryMap: { CoinModel(coinDetailModel: $0) },
-      receiveValue: { [weak self] coinModel in
-        if let uiAmount = amount?.uiAmountString {
-          self?.coins.append(coinModel.updateHoldings(amount: Double(uiAmount)!))
-          self?.walletValue += Double(uiAmount) ?? 0
-        } else {
-          self?.coins.append(coinModel)
-        }
-      })
-      .store(in: &self.cancellables)
   }
 }

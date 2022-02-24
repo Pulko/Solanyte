@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct CryptoTrackerTutorialApp: App {
+struct Solanyte: App {
   @StateObject private var vm = HomeViewModel()
   
   @State private var showLaunchView: Bool = true
@@ -19,7 +19,7 @@ struct CryptoTrackerTutorialApp: App {
     UITableView.appearance().backgroundColor = UIColor.clear
     UINavigationBar.appearance().tintColor = UIColor(Color.theme.accent)
   }
-
+  
   var body: some Scene {
     WindowGroup {
       ZStack {

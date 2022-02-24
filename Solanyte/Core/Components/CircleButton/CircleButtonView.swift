@@ -14,20 +14,25 @@ struct CircleButtonView: View {
   var width: Double
   var height: Double
   
+  var rotate: Bool
+  
   init(
     _ iconName: String,
     width: Double = 50,
     height: Double = 50,
+    rotate: Bool = false,
     action: @escaping (() -> Void) = {}
   ) {
     self.iconName = iconName
     self.action = action
     self.width = width
     self.height = height
+    self.rotate = rotate
   }
   
   var body: some View {
     Image(systemName: iconName)
+      .rotationEffect(Angle.degrees(rotate ? 360 : 0), anchor: .center)
       .foregroundColor(.theme.accent)
       .font(.headline)
       .frame(width: width, height: height, alignment: .center)

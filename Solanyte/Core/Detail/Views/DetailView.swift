@@ -27,11 +27,9 @@ struct DetailView: View {
       }
       
       VStack(spacing: 20) {
+        statisticSection
+        
         descriptionSection
-        
-        self.getSectionTitleitle("Statistics")
-        self.getStatisticsGrid(stats: vm.statistics)
-        
         
         if let redditUrl = vm.redditUrl,
            let urlLink = URL(string: redditUrl) {
@@ -64,26 +62,13 @@ extension DetailView {
     ]
   }
   
-  private func getSectionTitleitle(_ text: String) -> some View {
-    VStack {
-      HStack {
-        Text(text)
-          .bold()
-          .font(.title3)
-      }
-      .foregroundColor(.theme.accent)
-      .frame( maxWidth: .infinity, alignment: .leading)
-      Divider()
-    }
-  }
-  
-  private func getStatisticsGrid(stats: Array<StatisticModel>) -> some View {
+  private var statisticSection: some View {
     LazyVGrid(
       columns: columns,
       alignment: .leading,
       spacing: spacing,
       content: {
-        ForEach(stats) {  StatisticView(stat: $0) }
+        ForEach(vm.statistics) {  StatisticView(stat: $0) }
       }
     )
   }
@@ -123,7 +108,6 @@ extension DetailView {
   private var descriptionSection: some View {
     VStack {
       if let description = vm.coinDescription, !description.isEmpty {
-        self.getSectionTitleitle("Description")
         VStack(alignment: .leading) {
           Text(description)
             .lineLimit(showFullDescription ? nil : 3)

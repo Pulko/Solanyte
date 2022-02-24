@@ -30,6 +30,8 @@ class SolanaApiService {
     }
   }
   
+  static var lamport: Double = 0.000000001
+  
   static func handleResult<T>(_ result: Result<T, Error>, errorText: String, onSuccess: @escaping (T) -> Void) -> Void {
     switch result {
     case .success(let success):

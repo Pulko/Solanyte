@@ -45,16 +45,19 @@ extension CoinRowView {
   
   private var leftColumn: some View {
     HStack(spacing: 0) {
-      Text("\(coin.rank)")
-        .font(.caption)
-        .foregroundColor(.theme.secondaryText)
-        .padding(.trailing, 8)
       coinImage
-      Text(coin.symbol.uppercased())
-        .lineLimit(1)
-        .font(.headline)
-        .padding(.leading, 6)
-        .foregroundColor(.theme.accent)
+      VStack(alignment: .leading) {
+        Text(coin.symbol.uppercased())
+          .lineLimit(1)
+          .font(.headline)
+          .padding(.leading, 6)
+          .foregroundColor(.theme.accent)
+        Text("\(coin.rank)")
+          .font(.caption)
+          .foregroundColor(.theme.secondaryText)
+          .padding(.leading, 8)
+      }
+      
     }
   }
   

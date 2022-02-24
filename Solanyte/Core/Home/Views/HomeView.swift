@@ -30,28 +30,14 @@ struct HomeView: View {
         })
       // content
       VStack {
-        VStack {
-          homeHeader
-          
-          if isContent {
-            withAnimation {
-              HomeStatsView()
-                .padding(.bottom)
-            }
-          }
-        }
-        .background(Color.theme.container)
-        .cornerRadius(CGFloat(20))
-        .padding()
-        
+        HomeHeader(
+          showSettingsView: $showSettingsView,
+          showPortfolioView: $showPortfolioView
+        )
         
         if isContent {
           columnTitles
-          
-          renderCoins(coins: coinsToRender, showHoldings: true)
-            .transition(.move(edge: .leading))
-        } else {
-          portfolioEmptytext
+          coinsList
         }
         
         
@@ -70,44 +56,13 @@ extension HomeView {
       .ignoresSafeArea()
   }
   
-  private var homeHeader: some View {
-    HStack {
-      CircleButtonView("ellipsis") {
-        showSettingsView.toggle()
-      }
-      .animation(.none)
-      
-      Spacer()
-      
-      Text(isContent ? vm.portfolioValue.asCurrencyWith2Decimals() : "Solanyte")
-        .font(.title)
-        .fontWeight(.heavy)
-        .foregroundColor(.theme.accent)
-        .animation(.none)
-      
-      Spacer()
-      
-      CircleButtonView(
-        isContent ? "checkmark" : "plus"
-      ) {
-        withAnimation(.spring()) {
-          if !isContent {
-            showPortfolioView.toggle()
-          }
-        }
-      }
-      .colorMultiply(isContent ? .theme.green : .theme.accent)
-    }
-    .padding()
-  }
-  
-  private func renderCoins(coins: [CoinModel], showHoldings: Bool) -> some View {
+  private var coinsList: some View {
     List {
-      ForEach(coins) { coin in
+      ForEach(coinsToRender) { coin in
         NavigationLink(
           destination: NavigationLazyView(DetailView(coin: coin)),
           label: {
-            CoinRowView(coin: coin, showHoldings: showHoldings)
+            CoinRowView(coin: coin, showHoldings: true)
           }
         )
           .listRowBackground(Color.theme.background)
@@ -115,13 +70,7 @@ extension HomeView {
       }
     }
     .listStyle(PlainListStyle())
-  }
-  
-  private var portfolioEmptytext: some View {
-    Text("Tap + to get wallet token balance")
-      .font(.callout)
-      .foregroundColor(.theme.accent)
-      .padding(50)
+    .transition(.move(edge: .leading))
   }
   
   private var columnTitles: some View {
@@ -148,6 +97,6 @@ struct HomeView_Previews: PreviewProvider {
         .navigationBarHidden(true)
     }
     .environmentObject(dev.homeVM)
-    .preferredColorScheme(/*@START_MENU_TOKEN@*/.dark/*@END_MENU_TOKEN@*/)
+    .preferredColorScheme(.light)
   }
 }

@@ -56,8 +56,9 @@ extension PortfolioView {
           presentationMode.wrappedValue.dismiss()
         }) {
           Spacer()
-          Text("save portfolio".uppercased())
+          Text("save".uppercased())
             .foregroundColor(.theme.accent)
+            .fontWeight(.bold)
             .padding()
             .background(
               RoundedRectangle(cornerRadius: CGFloat(20))
@@ -81,7 +82,9 @@ extension PortfolioView {
           UIApplication.shared.endEditing()
         }, label: {
           Text("fetch".uppercased())
-          Image(systemName: "arrow.forward")
+            .foregroundColor(.theme.accent)
+            .fontWeight(.bold)
+            .padding()
         })
       }
       
@@ -132,6 +135,8 @@ extension PortfolioView {
     portfolioVm.coins.forEach { coin in
       vm.updatePortfolio(coin: coin, amount: coin.currentHoldings ?? 0.0)
     }
+    
+    vm.updateWallet(key: portfolioVm.walletAddress)
     
     UIApplication.shared.endEditing()
   }
