@@ -24,7 +24,7 @@ struct SettingsView: View {
       }
       .listStyle(GroupedListStyle())
       .toolbar {
-        ToolbarItem(placement: .navigationBarLeading) {
+        ToolbarItem(placement: .navigationBarTrailing) {
           XmarkButton()
         }
       }

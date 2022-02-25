@@ -5,8 +5,6 @@
 //  Created by Фёдор Ткаченко on 13.12.21.
 //
 
-// 5exSWLLQWC3zD5BGyFY8sRFQcRuv1dworDD5cgUwrXxD
-
 import SwiftUI
 import Solana
 
@@ -15,22 +13,13 @@ struct PortfolioView: View {
   @EnvironmentObject private var vm: HomeViewModel
   @StateObject private var portfolioVm = PortfolioViewModel()
   
-  @State private var selectedCoin: CoinModel? = nil
-  @State private var quantity: String = ""
-  
   var body: some View {
     NavigationView {
       VStack {
-        VStack(alignment: .leading, spacing: 0, content: {
-          walletDisplayData
-            .opacity(portfolioVm.isReady ? 1.0 : 0.0)
-          
-          if portfolioVm.isReady {
-            savePortfolioButton
-          } else {
-            walletAddressInput
-              .padding(.top, 50)
-          }
+        VStack(spacing: 0, content: {
+          walletAddressInput
+            .padding(.top)
+          Spacer()
         })
           .padding(30)
           .shadow(color: .theme.container, radius: 20, x: 0, y: 0)
@@ -38,7 +27,7 @@ struct PortfolioView: View {
       }
       .navigationTitle("Add wallet")
       .toolbar {
-        ToolbarItem(placement: .navigationBarLeading) {
+        ToolbarItem(placement: .navigationBarTrailing) {
           XmarkButton()
         }
       }
@@ -49,7 +38,6 @@ struct PortfolioView: View {
 extension PortfolioView {
   private var savePortfolioButton: some View {
     VStack {
-      Spacer()
       HStack(alignment: .center) {
         Button(action: {
           saveButtonPressed()
@@ -73,19 +61,27 @@ extension PortfolioView {
   
   private var walletAddressInput: some View {
     VStack {
-      TextField("Solana wallet address", text: $portfolioVm.walletAddress)
-        .padding()
+      if portfolioVm.isReady {
+        walletDisplayData
+      } else {
+        TextField("Solana wallet address", text: $portfolioVm.walletAddress)
+          .padding()
+          .frame(height: 80)
+      }
       
-      HStack(spacing: 40) {
-        Button(action: {
-          portfolioVm.fetchWalletByAddress()
-          UIApplication.shared.endEditing()
-        }, label: {
-          Text("fetch".uppercased())
-            .foregroundColor(.theme.accent)
-            .fontWeight(.bold)
-            .padding()
-        })
+      HStack {
+        if portfolioVm.isReady {
+          savePortfolioButton
+        } else {
+          Button(action: {
+            portfolioVm.fetchWalletByAddress()
+          }, label: {
+            Text("fetch".uppercased())
+              .foregroundColor(.theme.accent)
+              .fontWeight(.bold)
+              .padding()
+          })
+        }
       }
       
       
@@ -93,14 +89,12 @@ extension PortfolioView {
         Text("⛔️ Incorrect address")
           .foregroundColor(.theme.red)
           .font(.footnote)
-          .padding()
       }
       
       if (portfolioVm.isLoading) {
         Text("📦 Loading...")
-          .foregroundColor(.theme.secondaryText)
+          .foregroundColor(.theme.accent)
           .font(.footnote)
-          .padding()
       }
     }
     .padding()
@@ -127,6 +121,7 @@ extension PortfolioView {
         Text("\(portfolioVm.coins.count)")
       }
     }
+    .padding()
   }
   
   /* MARK: OLD EXTENSIONS */

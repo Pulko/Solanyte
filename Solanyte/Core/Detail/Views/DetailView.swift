@@ -99,6 +99,9 @@ extension DetailView {
           .fontWeight(.bold)
           .font(.title)
           .foregroundColor(.theme.accent)
+          .frame(width: 100)
+          .lineLimit(1)
+          .truncationMode(.tail)
       }
       CoinImageView(coin: vm.coin)
         .frame(width: 25, height: 25)

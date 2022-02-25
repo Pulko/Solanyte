@@ -84,7 +84,7 @@ extension ChartView {
     VStack(alignment: .leading) {
       Text(maxY.asCurrencyWith6Decimals())
       Spacer()
-      Text(((maxY - minY) / 2).asCurrencyWith6Decimals())
+      Text((minY + ((maxY - minY) / 2)).asCurrencyWith6Decimals())
       Spacer()
       Text(minY.asCurrencyWith6Decimals())
     }
