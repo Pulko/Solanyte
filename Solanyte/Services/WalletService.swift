@@ -29,7 +29,7 @@ class WalletService {
   private func getWallets(walletPublicKey: String) -> Void {
     solanaApiService.actions.getTokenWallets(account: walletPublicKey) { (result: Result<[Wallet], Error>) in
       SolanaApiService.handleResult(result, errorText: "Unable to get wallets from Solana API") { (wallets: [Wallet]) -> Void in
-        self.wallets = wallets
+        self.getTokens(wallets: wallets)
       }
     }
   }
@@ -86,7 +86,7 @@ class WalletService {
         ids: ids,
         tryMap: tryMap,
         receiveValue: { [weak self] coinModels in
-          self?.coins = coinModels
+          self?.coins.append(contentsOf: coinModels)
         })
         .store(in: &self.cancellables)
     }

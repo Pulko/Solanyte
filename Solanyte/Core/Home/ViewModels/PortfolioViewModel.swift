@@ -45,11 +45,6 @@ class PortfolioViewModel: ObservableObject {
   
   private func addSubscribers() {
     if let walletService = walletService {
-      walletService.$wallets
-        .receive(on: DispatchQueue.main)
-        .sink { walletService.getTokens(wallets: $0) }
-        .store(in: &cancellables)
-      
       walletService.$tokens
         .receive(on: DispatchQueue.main)
         .sink { walletService.getCoins(tokens: $0) }
@@ -58,7 +53,7 @@ class PortfolioViewModel: ObservableObject {
       walletService.$coins
         .receive(on: DispatchQueue.main)
         .sink { [weak self] (returnedCoins: Array<CoinModel>) in
-          self?.coins = returnedCoins
+          self?.coins = returnedCoins.uniqued()
         }
         .store(in: &cancellables)
       
