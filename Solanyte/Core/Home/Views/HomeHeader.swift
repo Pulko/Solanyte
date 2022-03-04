@@ -93,10 +93,11 @@ extension HomeHeader {
           .animation(.none)
         if (fromWallet) {
           Text(vm.walletEntity?.key ?? "")
-            .foregroundColor(.theme.accent)
+            .foregroundColor(.theme.secondaryText)
             .frame(width: 100)
             .lineLimit(1)
             .truncationMode(.middle)
+            .animation(.none)
         }
       }
       

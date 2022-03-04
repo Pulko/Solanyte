@@ -11,7 +11,7 @@ import Solana
 struct PortfolioView: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject private var vm: HomeViewModel
-  @StateObject private var portfolioVm = PortfolioViewModel()
+  @EnvironmentObject private var portfolioVm: PortfolioViewModel
   
   var body: some View {
     NavigationView {
@@ -30,6 +30,9 @@ struct PortfolioView: View {
         ToolbarItem(placement: .navigationBarTrailing) {
           XmarkButton()
         }
+      }
+      .onAppear {
+        portfolioVm.deleteAll()
       }
     }
   }
@@ -65,8 +68,8 @@ extension PortfolioView {
         walletDisplayData
       } else {
         TextField("Solana wallet address", text: $portfolioVm.walletAddress)
+          .textFieldStyle(RoundedBorderTextFieldStyle())
           .padding()
-          .frame(height: 80)
       }
       
       HStack {

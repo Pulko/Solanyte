@@ -29,6 +29,7 @@ class WalletService {
   private func getWallets(walletPublicKey: String) -> Void {
     solanaApiService.actions.getTokenWallets(account: walletPublicKey) { (result: Result<[Wallet], Error>) in
       SolanaApiService.handleResult(result, errorText: "Unable to get wallets from Solana API") { (wallets: [Wallet]) -> Void in
+        self.wallets = wallets
         self.getTokens(wallets: wallets)
       }
     }
@@ -82,13 +83,15 @@ class WalletService {
         }
       }
       
-      CoingeckoApiService.fetchCoinModelsByIds(
-        ids: ids,
-        tryMap: tryMap,
-        receiveValue: { [weak self] coinModels in
-          self?.coins.append(contentsOf: coinModels)
-        })
-        .store(in: &self.cancellables)
+      if (tokens.count == self.wallets.count) {
+        CoingeckoApiService.fetchCoinModelsByIds(
+          ids: ids,
+          tryMap: tryMap,
+          receiveValue: { [weak self] coinModels in
+            self?.coins.append(contentsOf: coinModels)
+          })
+          .store(in: &self.cancellables)
+      }
     }
   }
 }

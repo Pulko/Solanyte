@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct Solanyte: App {
   @StateObject private var vm = HomeViewModel()
+  @StateObject private var portfolioVm = PortfolioViewModel()
   
   @State private var showLaunchView: Bool = true
   
@@ -29,6 +30,7 @@ struct Solanyte: App {
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .environmentObject(vm)
+        .environmentObject(portfolioVm)
         .opacity(showLaunchView ? 0.0 : 1.0)
         
         ZStack {

@@ -37,6 +37,15 @@ class PortfolioViewModel: ObservableObject {
     }
   }
   
+  func deleteAll() -> Void {
+    self.walletAddress = ""
+    self.coins.removeAll()
+    self.walletValue = 0
+    self.isLoading = false
+    self.isError = false
+    self.isReady = false
+  }
+  
   private func validateWalletAddress(_ address: String) -> Bool {
     let isLengthPassed = address.count >= 32 && address.count <= 44
     
@@ -52,6 +61,7 @@ class PortfolioViewModel: ObservableObject {
       
       walletService.$coins
         .receive(on: DispatchQueue.main)
+        .map(filterAndSortCoins)
         .sink { [weak self] (returnedCoins: Array<CoinModel>) in
           self?.coins = returnedCoins.uniqued()
         }
@@ -68,5 +78,13 @@ class PortfolioViewModel: ObservableObject {
         }
         .store(in: &cancellables)
     }
+  }
+  
+  private func filterAndSortCoins(coins: [CoinModel]) -> [CoinModel] {
+    var cloneCoins = coins
+    
+    SortManager.filterCoins(coins: &cloneCoins, filter: false)
+    SortManager.sortCoins(coins: &cloneCoins)
+    return cloneCoins
   }
 }

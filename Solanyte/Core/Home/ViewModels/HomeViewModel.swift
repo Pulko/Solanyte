@@ -7,12 +7,7 @@
 
 import Foundation
 import SwiftUI
-import UIKit
 import Combine
-
-enum SortOption {
-  case rank, rankReversed, holdings, holdingsReversed, price, priceReversed
-}
 
 class HomeViewModel: ObservableObject {
   @Published var isLoading: Bool = false
@@ -90,42 +85,9 @@ class HomeViewModel: ObservableObject {
   private func filterAndSortCoins(coins: [CoinModel], sort: SortOption, filter: Bool) -> [CoinModel] {
     var cloneCoins = coins
     
-    filterCoins(coins: &cloneCoins, filter: filter)
-    sortCoins(coins: &cloneCoins, sort: sort)
+    SortManager.filterCoins(coins: &cloneCoins, filter: filter)
+    SortManager.sortCoins(coins: &cloneCoins, sort: sort)
     return cloneCoins
-  }
-  
-  private func filterCoins(coins: inout [CoinModel], filter: Bool) {
-    if (filter) {
-      coins = coins.filter { $0.currentHoldingsValue > 0 }
-    }
-  }
-  
-  private func sortCoins(coins: inout [CoinModel], sort: SortOption) {
-    switch sort {
-    case .price:
-      coins.sort {
-        if let first = $0.currentPrice, let second = $1.currentPrice {
-          return first > second
-        }
-        return false
-      }
-    case .priceReversed:
-      coins.sort {
-        if let first = $0.currentPrice, let second = $1.currentPrice {
-          return first < second
-        }
-        return false
-      }
-    case .rank:
-      coins.sort { $0.rank > $1.rank }
-    case .rankReversed:
-      coins.sort { $0.rank < $1.rank }
-    case .holdings:
-      coins.sort { $0.currentHoldingsValue > $1.currentHoldingsValue }
-    case .holdingsReversed:
-      coins.sort { $0.currentHoldingsValue < $1.currentHoldingsValue }
-    }
   }
 }
 
