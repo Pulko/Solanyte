@@ -42,20 +42,26 @@ class PortfolioDataService {
     }
     
     self.getPortfolio()
+    self.getWallet()
   }
   
-  // MARK: Public
-  
-  func updatePortfolio(coin: CoinModel, amount: Double) {
-    if let entity = savedEntities.first(where: { $0.coinID == coin.id }) {
-      if amount > 0 {
-        update(entity: entity, amount: amount)
+  // MARK: Public  
+  func updatePortfolio(coins: [CoinModel]) {
+    coins.forEach { coin in
+      let amount = coin.currentHoldings ?? 0.0
+
+      if let entity = savedEntities.first(where: { $0.coinID == coin.id }) {
+        if amount > 0 {
+          update(entity: entity, amount: amount)
+        } else {
+          delete(entity: entity)
+        }
       } else {
-        delete(entity: entity)
+        add(coin: coin, amount: amount)
       }
-    } else {
-      add(coin: coin, amount: amount)
     }
+    
+    applyChanges()
   }
   
   func updateWallet(key: String, balance: Double = 0) {
@@ -79,19 +85,28 @@ class PortfolioDataService {
   
   func reload() -> Void {
     self.getPortfolio()
+    self.getWallet()
   }
   
   // MARK: Private
   
   private func getPortfolio() -> Void {
     let request = NSFetchRequest<PortfolioEntity>(entityName: portfolioEntityName)
-    let walletRequest = NSFetchRequest<WalletEntity>(entityName: walletEntityName)
     
     do {
       savedEntities = try container.viewContext.fetch(request)
-      savedWallet = try walletContainer.viewContext.fetch(walletRequest).first
       
       self.handleSavedEntities()
+    } catch let error {
+      print(NetworkingManager.NetworkingError.badCoreDataResponse(error: error))
+    }
+  }
+  
+  private func getWallet() -> Void {
+    let walletRequest = NSFetchRequest<WalletEntity>(entityName: walletEntityName)
+    
+    do {
+      savedWallet = try walletContainer.viewContext.fetch(walletRequest).first
     } catch let error {
       print(NetworkingManager.NetworkingError.badCoreDataResponse(error: error))
     }
@@ -110,7 +125,9 @@ class PortfolioDataService {
   private func updateWalletEntity(entity: WalletEntity, balance: Double, key: String) {
     entity.balance = balance
     entity.key = key
+
     save(container: walletContainer)
+    getWallet()
   }
   
   private func addWalletEntity(balance: Double, key: String) {
@@ -119,6 +136,7 @@ class PortfolioDataService {
     entity.key = key
     
     save(container: walletContainer)
+    getWallet()
   }
   
   // Portfolio
@@ -128,12 +146,13 @@ class PortfolioDataService {
     entity.coinID = coin.id
     entity.amount = amount
     
-    applyChanges()
+    save(container: container)
   }
   
   private func update(entity: PortfolioEntity, amount: Double) {
     entity.amount = amount
-    applyChanges()
+
+    save(container: container)
   }
   
   private func applyChanges() {
@@ -143,7 +162,8 @@ class PortfolioDataService {
   
   private func delete(entity: PortfolioEntity) {
     container.viewContext.delete(entity)
-    applyChanges()
+    
+    save(container: container)
   }
   
   // MARK: fetch data

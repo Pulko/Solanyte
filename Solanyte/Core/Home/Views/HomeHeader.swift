@@ -11,14 +11,6 @@ struct HomeHeader: View {
   @EnvironmentObject private var vm: HomeViewModel
   @Binding var showSettingsView: Bool
   @Binding var showPortfolioView: Bool
-  
-  private var coinsToRender: Array<CoinModel> {
-    vm.portfolioCoins
-  }
-  
-  private var isContent: Bool {
-    coinsToRender.count > 0
-  }
 
   private var fromWallet: Bool {
     vm.fromWallet

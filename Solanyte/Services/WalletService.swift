@@ -63,7 +63,7 @@ class WalletService {
   
   func getCoins(tokens: Array<TokenData> = []) -> Void {
     if tokens.count > 0 {
-      var ids = tokens.uniqued().compactMap { $0.coingeckoID }
+      var ids = tokens.uniqued().compactMap { $0.coingeckoID }.filter { $0 != "" }
       ids.append(CoingeckoApiService.solanaId)
       
       let tryMap = { (models: [CoinModel]) -> [CoinModel] in

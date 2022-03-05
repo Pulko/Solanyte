@@ -130,10 +130,7 @@ extension PortfolioView {
   /* MARK: OLD EXTENSIONS */
   
   private func saveButtonPressed() {
-    portfolioVm.coins.forEach { coin in
-      vm.updatePortfolio(coin: coin, amount: coin.currentHoldings ?? 0.0)
-    }
-    
+    vm.updatePortfolio(coins: portfolioVm.coins)
     vm.updateWallet(key: portfolioVm.walletAddress)
     
     UIApplication.shared.endEditing()

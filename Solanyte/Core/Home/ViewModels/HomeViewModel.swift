@@ -54,16 +54,12 @@ class HomeViewModel: ObservableObject {
     $portfolioCoins
       .sink { [weak self] (coins: [CoinModel]) in
         self?.portfolioValue = coins.reduce(0) { $0 + $1.currentHoldingsValue }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
-          self?.isLoading = false
-        }
       }
       .store(in: &cancellables)
   }
   
-  func updatePortfolio(coin: CoinModel, amount: Double) {
-    portfolioDataService.updatePortfolio(coin: coin, amount: amount)
+  func updatePortfolio(coins: [CoinModel]) {
+    portfolioDataService.updatePortfolio(coins: coins)
   }
   
   func updateWallet(key: String) {
