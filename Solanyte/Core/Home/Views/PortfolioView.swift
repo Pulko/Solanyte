@@ -64,16 +64,19 @@ extension PortfolioView {
   
   private var walletAddressInput: some View {
     VStack {
-      Image("solana")
-        .resizable()
-        .frame(height: 30)
-        .padding()
       if portfolioVm.isReady {
         walletDisplayData
       } else {
-        TextField("Solana wallet address", text: $portfolioVm.walletAddress)
-          .textFieldStyle(RoundedBorderTextFieldStyle())
-          .padding()
+        HStack {
+          Image("solana-logo")
+            .resizable()
+            .scaledToFit()
+            .frame(height: 20)
+            .padding(.trailing)
+          TextField("Solana wallet address", text: $portfolioVm.walletAddress)
+            .textFieldStyle(RoundedBorderTextFieldStyle())
+        }
+        .padding()
       }
       
       HStack {
