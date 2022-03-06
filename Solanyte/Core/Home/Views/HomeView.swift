@@ -9,7 +9,6 @@ import SwiftUI
 
 struct HomeView: View {
   @EnvironmentObject private var vm: HomeViewModel
-  @EnvironmentObject private var portfolioVm: PortfolioViewModel
   @State private var showPortfolioView: Bool = false
   @State private var showSettingsView: Bool = false
   
@@ -27,7 +26,6 @@ struct HomeView: View {
       background
         .sheet(isPresented: $showPortfolioView, content: {
           PortfolioView()
-            .environmentObject(vm)
         })
       // content
       VStack {

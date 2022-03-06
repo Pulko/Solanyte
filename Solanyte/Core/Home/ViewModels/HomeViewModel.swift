@@ -54,6 +54,7 @@ class HomeViewModel: ObservableObject {
     $portfolioCoins
       .sink { [weak self] (coins: [CoinModel]) in
         self?.portfolioValue = coins.reduce(0) { $0 + $1.currentHoldingsValue }
+        self?.isLoading = false
       }
       .store(in: &cancellables)
   }

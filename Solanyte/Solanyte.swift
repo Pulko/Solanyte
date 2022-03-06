@@ -26,11 +26,11 @@ struct Solanyte: App {
       ZStack {
         NavigationView {
           HomeView()
+            .environmentObject(vm)
+            .environmentObject(portfolioVm)
             .navigationBarHidden(true)
         }
         .navigationViewStyle(StackNavigationViewStyle())
-        .environmentObject(vm)
-        .environmentObject(portfolioVm)
         .opacity(showLaunchView ? 0.0 : 1.0)
         
         ZStack {
