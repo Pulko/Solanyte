@@ -11,7 +11,7 @@ import Solana
 struct PortfolioView: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject private var vm: HomeViewModel
-  @EnvironmentObject private var portfolioVm: PortfolioViewModel
+  @StateObject private var portfolioVm = PortfolioViewModel()
   
   var body: some View {
     NavigationView {
@@ -139,7 +139,5 @@ extension PortfolioView {
   private func saveButtonPressed() {
     vm.updatePortfolio(coins: portfolioVm.coins)
     vm.updateWallet(key: portfolioVm.walletAddress)
-    
-    UIApplication.shared.endEditing()
   }
 }

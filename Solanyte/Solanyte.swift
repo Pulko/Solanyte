@@ -10,7 +10,6 @@ import SwiftUI
 @main
 struct Solanyte: App {
   @StateObject private var vm = HomeViewModel()
-  @StateObject private var portfolioVm = PortfolioViewModel()
   
   @State private var showLaunchView: Bool = true
   
@@ -19,6 +18,7 @@ struct Solanyte: App {
     UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: UIColor(Color.theme.accent)]
     UITableView.appearance().backgroundColor = UIColor.clear
     UINavigationBar.appearance().tintColor = UIColor(Color.theme.accent)
+    UITextView.appearance().backgroundColor = UIColor.clear
   }
   
   var body: some Scene {
@@ -27,7 +27,6 @@ struct Solanyte: App {
         NavigationView {
           HomeView()
             .environmentObject(vm)
-            .environmentObject(portfolioVm)
             .navigationBarHidden(true)
         }
         .navigationViewStyle(StackNavigationViewStyle())

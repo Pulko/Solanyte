@@ -12,7 +12,7 @@ struct SettingsView: View {
   
   var body: some View {
     NavigationView {
-      VStack {
+      ScrollView(showsIndicators: false) {
         VStack(alignment: .center) {
           VStack(alignment: .center) {
             Image("logo-transparent")
@@ -26,7 +26,7 @@ struct SettingsView: View {
               .fontWeight(.medium)
               .padding()
           }
-          Spacer()
+          Spacer(minLength: 150)
           courseSection
           solanaSection
           coingeckoSection
@@ -34,7 +34,6 @@ struct SettingsView: View {
           developerSection
         }
       }
-      .listStyle(GroupedListStyle())
       .toolbar {
         ToolbarItem(placement: .navigationBarTrailing) {
           XmarkButton()
