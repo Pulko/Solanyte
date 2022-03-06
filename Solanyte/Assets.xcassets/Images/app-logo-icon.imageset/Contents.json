@@ -1,17 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "ios-marketing.png",
+      "filename" : "icon-25@1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "ios-marketing@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "ios-marketing@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
