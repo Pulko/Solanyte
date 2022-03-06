@@ -1,6 +1,6 @@
 //
 //  HapticManager.swift
-//  CryptoTrackerTutorial
+//  Solanyte
 //
 //  Created by Фёдор Ткаченко on 04.01.22.
 //

@@ -1,6 +1,6 @@
 //
 //  HomeView.swift
-//  CryptoTrackerTutorial
+//  Solanyte
 //
 //  Created by Фёдор Ткаченко on 08.11.21.
 //

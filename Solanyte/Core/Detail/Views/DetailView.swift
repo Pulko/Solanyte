@@ -1,6 +1,6 @@
 //
 //  DetailView.swift
-//  CryptoTrackerTutorial
+//  Solanyte
 //
 //  Created by Фёдор Ткаченко on 08.01.22.
 //
@@ -99,7 +99,7 @@ extension DetailView {
           .fontWeight(.bold)
           .font(.title)
           .foregroundColor(.theme.accent)
-          .frame(width: 100)
+          .frame(width: 200)
           .lineLimit(1)
           .truncationMode(.tail)
       }

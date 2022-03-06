@@ -1,6 +1,6 @@
 //
 //  ColumnSortingTitle.swift
-//  CryptoTrackerTutorial
+//  Solanyte
 //
 //  Created by Фёдор Ткаченко on 05.01.22.
 //

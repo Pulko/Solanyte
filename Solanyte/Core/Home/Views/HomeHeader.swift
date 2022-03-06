@@ -11,7 +11,7 @@ struct HomeHeader: View {
   @EnvironmentObject private var vm: HomeViewModel
   @Binding var showSettingsView: Bool
   @Binding var showPortfolioView: Bool
-
+  
   private var fromWallet: Bool {
     vm.fromWallet
   }
@@ -29,24 +29,13 @@ struct HomeHeader: View {
           }
           .padding([.bottom, .horizontal])
         }
-      } else {
-        portfolioEmptytext
       }
     }
-    .background(Color.theme.container)
-    .cornerRadius(CGFloat(20))
     .padding()
   }
 }
 
 extension HomeHeader {
-  private var portfolioEmptytext: some View {
-    Text("Tap + to add a Solana wallet")
-      .font(.callout)
-      .foregroundColor(.theme.accent)
-      .padding(50)
-  }
-  
   private var updateButton: some View {
     CircleButtonView("arrow.triangle.2.circlepath", rotate: vm.isLoading) {
       withAnimation(.linear(duration: 2)) {
@@ -95,17 +84,34 @@ extension HomeHeader {
       
       Spacer()
       
-      CircleButtonView(fromWallet ? "trash" : "plus") {
-        withAnimation(.spring()) {
-          if fromWallet {
+      walletButtonElement
+    }
+    .padding()
+  }
+  
+  private var walletButtonElement: some View {
+    VStack {
+      if fromWallet {
+        CircleButtonView("trash") {
+          withAnimation(.spring()) {
             vm.removeData()
-          } else {
+          }
+        }
+      } else {
+        CircleButtonView(name: "solana-logo") {
+          withAnimation(.spring()) {
             showPortfolioView.toggle()
           }
         }
+        .padding(.top)
+      }
+      if !fromWallet {
+        Text("Add wallet")
+          .foregroundColor(.theme.accent)
+          .fontWeight(.light)
+          .font(.caption2)
       }
     }
-    .padding()
   }
 }
 

@@ -1,6 +1,6 @@
 //
 //  CoinImageService.swift
-//  CryptoTrackerTutorial
+//  Solanyte
 //
 //  Created by Фёдор Ткаченко on 17.11.21.
 //

@@ -1,6 +1,6 @@
 //
 //  PortfolioView.swift
-//  CryptoTrackerTutorial
+//  Solanyte
 //
 //  Created by Фёдор Ткаченко on 13.12.21.
 //
@@ -64,6 +64,10 @@ extension PortfolioView {
   
   private var walletAddressInput: some View {
     VStack {
+      Image("solana")
+        .resizable()
+        .frame(height: 30)
+        .padding()
       if portfolioVm.isReady {
         walletDisplayData
       } else {
@@ -134,12 +138,5 @@ extension PortfolioView {
     vm.updateWallet(key: portfolioVm.walletAddress)
     
     UIApplication.shared.endEditing()
-  }
-}
-
-struct PortfolioView_Previews: PreviewProvider {
-  static var previews: some View {
-    PortfolioView()
-      .environmentObject(dev.homeVM)
   }
 }

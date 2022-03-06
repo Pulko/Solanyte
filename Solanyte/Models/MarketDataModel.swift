@@ -1,6 +1,6 @@
 //
 //  MarketDataModel.swift
-//  CryptoTrackerTutorial
+//  Solanyte
 //
 //  Created by Фёдор Ткаченко on 03.12.21.
 //

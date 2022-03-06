@@ -1,6 +1,6 @@
 //
 //  XmarkButton.swift
-//  CryptoTrackerTutorial
+//  Solanyte
 //
 //  Created by Фёдор Ткаченко on 13.12.21.
 //

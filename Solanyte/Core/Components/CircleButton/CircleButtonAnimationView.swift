@@ -1,6 +1,6 @@
 //
 //  CircleButtonAnimationView.swift
-//  CryptoTrackerTutorial
+//  Solanyte
 //
 //  Created by Фёдор Ткаченко on 10.11.21.
 //
