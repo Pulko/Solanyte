@@ -64,6 +64,13 @@ class PortfolioViewModel: ObservableObject {
         .map(filterAndSortCoins)
         .sink { [weak self] (returnedCoins: Array<CoinModel>) in
           self?.coins = returnedCoins.uniqued()
+          
+          if ((self?.coins.count ?? 0) > 0) {
+            self?.isLoading = false
+            self?.isReady = true
+          } else {
+            self?.isLoading = true
+          }
         }
         .store(in: &cancellables)
       
@@ -71,10 +78,6 @@ class PortfolioViewModel: ObservableObject {
         .receive(on: DispatchQueue.main)
         .sink { [weak self] returnedWalletValue in
           self?.walletValue = returnedWalletValue
-          
-          self?.isLoading = false
-          self?.isError = false
-          self?.isReady = true
         }
         .store(in: &cancellables)
     }

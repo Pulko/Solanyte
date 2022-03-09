@@ -9,13 +9,14 @@ import SwiftUI
 
 struct HomeView: View {
   @EnvironmentObject private var vm: HomeViewModel
+  
   @State private var showPortfolioView: Bool = false
   @State private var showSettingsView: Bool = false
   
   private var isContent: Bool {
     coinsToRender.count > 0
   }
-
+  
   private var coinsToRender: Array<CoinModel> {
     vm.portfolioCoins
   }
@@ -33,13 +34,11 @@ struct HomeView: View {
           showSettingsView: $showSettingsView,
           showPortfolioView: $showPortfolioView
         )
-          .shadow(color: .theme.container, radius: 20, x: 0, y: 0)
         
         if isContent {
           columnTitles
           coinsList
         }
-        
         
         Spacer(minLength: 0)
       }

@@ -18,12 +18,9 @@ struct PortfolioView: View {
       VStack {
         VStack(spacing: 0, content: {
           walletAddressInput
-            .padding(.top)
           Spacer()
         })
           .padding(30)
-          .shadow(color: .theme.container, radius: 20, x: 0, y: 0)
-        
       }
       .navigationTitle("Add wallet")
       .toolbar {
@@ -42,20 +39,16 @@ extension PortfolioView {
   private var savePortfolioButton: some View {
     VStack {
       HStack(alignment: .center) {
-        Button(action: {
-          saveButtonPressed()
-          presentationMode.wrappedValue.dismiss()
-        }) {
-          Spacer()
-          Text("save".uppercased())
-            .foregroundColor(.theme.accent)
-            .fontWeight(.bold)
-            .padding()
-            .background(
-              RoundedRectangle(cornerRadius: CGFloat(20))
-                .foregroundColor(.theme.container)
-            )
-          Spacer()
+        if portfolioVm.isReady {
+          Button(action: {
+            saveButtonPressed()
+            presentationMode.wrappedValue.dismiss()
+          }) {
+            Image(systemName: "square.and.arrow.down")
+            Text("save".capitalized)
+              .foregroundColor(.theme.accent)
+              .fontWeight(.bold)
+          }
         }
       }
       .padding()
@@ -63,55 +56,71 @@ extension PortfolioView {
   }
   
   private var walletAddressInput: some View {
-    VStack {
-      if portfolioVm.isReady {
-        walletDisplayData
-      } else {
-        HStack {
-          Image("solana-logo")
-            .resizable()
-            .scaledToFit()
-            .frame(height: 20)
-            .padding(.trailing)
-          TextField("Solana wallet address", text: $portfolioVm.walletAddress)
-            .textFieldStyle(RoundedBorderTextFieldStyle())
-        }
-        .padding()
-      }
-      
-      HStack {
+    GroupBox {
+      VStack {
         if portfolioVm.isReady {
-          savePortfolioButton
+          walletDisplayData
+            .padding(.top)
         } else {
-          Button(action: {
-            portfolioVm.fetchWalletByAddress()
-          }, label: {
-            Text("fetch".uppercased())
-              .foregroundColor(.theme.accent)
-              .fontWeight(.bold)
-              .padding()
-          })
+          HStack {
+            Image("solana-logo")
+              .resizable()
+              .scaledToFit()
+              .frame(height: 20)
+              .padding(.trailing, 6)
+            TextField("Solana wallet address", text: $portfolioVm.walletAddress)
+              .textFieldStyle(RoundedBorderTextFieldStyle())
+          }
+          .padding(.top)
         }
-      }
-      
-      
-      if (portfolioVm.isError) {
-        Text("⛔️ Incorrect address")
-          .foregroundColor(.theme.red)
-          .font(.footnote)
-      }
-      
-      if (portfolioVm.isLoading) {
-        Text("📦 Loading...")
-          .foregroundColor(.theme.accent)
-          .font(.footnote)
+        
+        
+        HStack {
+          if portfolioVm.isReady {
+            savePortfolioButton
+          } else {
+            if !portfolioVm.walletAddress.isEmpty {
+              Button(action: {
+                portfolioVm.fetchWalletByAddress()
+              }, label: {
+                Image(systemName: "personalhotspot")
+                Text("fetch".capitalized)
+                  .foregroundColor(.theme.accent)
+                  .fontWeight(.bold)
+              })
+                .padding()
+            }
+            
+            if portfolioVm.walletAddress.isEmpty {
+              Button(action: {
+                if UIPasteboard.general.hasStrings {
+                  portfolioVm.walletAddress = UIPasteboard.general.string ?? ""
+                }
+              }, label: {
+                Image(systemName: "doc.on.clipboard")
+                Text("paste".capitalized)
+                  .foregroundColor(.theme.accent)
+                  .fontWeight(.bold)
+              })
+                .padding()
+            }
+          }
+        }
+        
+        
+        if (portfolioVm.isError) {
+          Text("⛔️ Error occured...")
+            .foregroundColor(.theme.red)
+            .font(.footnote)
+        }
+        
+        if (portfolioVm.isLoading) {
+          Text("📦 Loading...")
+            .foregroundColor(.theme.accent)
+            .font(.footnote)
+        }
       }
     }
-    .padding()
-    .background(
-      RoundedRectangle(cornerRadius: CGFloat(20))
-        .foregroundColor(.theme.container)
-    )
   }
   
   private var walletDisplayData: some View {
@@ -131,7 +140,6 @@ extension PortfolioView {
         Text("\(portfolioVm.coins.count)")
       }
     }
-    .padding()
   }
   
   /* MARK: OLD EXTENSIONS */

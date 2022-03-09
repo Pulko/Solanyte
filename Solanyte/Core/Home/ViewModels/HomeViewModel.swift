@@ -77,6 +77,8 @@ class HomeViewModel: ObservableObject {
     isLoading = true
     portfolioDataService.deleteAll()
     HapticManager.notification(type: .success)
+    
+    self.reloadData()
   }
   
   private func filterAndSortCoins(coins: [CoinModel], sort: SortOption, filter: Bool) -> [CoinModel] {

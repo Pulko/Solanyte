@@ -46,7 +46,7 @@ extension HomeHeader {
   
   private var hideZeroBalance: some View {
     VStack(alignment: .leading) {
-      Toggle("", isOn: $vm.isAboveZero)
+      Toggle("Hide zero", isOn: $vm.isAboveZero)
         .labelsHidden()
         .toggleStyle(SwitchToggleStyle(tint: .theme.secondaryText))
       Text("Hide zero")
@@ -123,5 +123,6 @@ struct HomeHeader_Previews: PreviewProvider {
       showPortfolioView: .constant(false)
     )
       .environmentObject(dev.homeVM)
+      .preferredColorScheme(.dark)
   }
 }
