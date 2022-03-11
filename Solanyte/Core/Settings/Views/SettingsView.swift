@@ -16,7 +16,7 @@ struct SettingsView: View {
       ScrollView(showsIndicators: false) {
         VStack(alignment: .center, spacing: 20) {
           VStack(alignment: .center) {
-            Image("logo-transparent")
+            Image("solanyte-transparent")
             Text("Solanyte")
               .font(.callout)
               .foregroundColor(.theme.accent)

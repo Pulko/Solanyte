@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LaunchView: View {
-  @State private var loadingText: [String] = "Loading your portfolio...".map { String($0) }
+  @State private var loadingText: [String] = "solanyte".uppercased().map { String($0) }
   @State private var showLoadingText: Bool = false
   @State private var counter: Int = 0
   @State private var loops: Int = 0
@@ -20,7 +20,7 @@ struct LaunchView: View {
   var body: some View {
     ZStack {
       Color.launch.background.ignoresSafeArea()
-      Image("logo-transparent")
+      Image("solanyte-transparent")
         .resizable()
         .frame(width: 100, height: 100)
       ZStack {
@@ -31,7 +31,7 @@ struct LaunchView: View {
                 .font(.headline)
                 .fontWeight(.heavy)
                 .foregroundColor(.launch.accent)
-                .offset(y: counter == index ? -3 : 0)
+                .offset(x: counter == index ? -1 : 0)
             }
           }
           .transition(AnyTransition.scale.animation(.easeIn))

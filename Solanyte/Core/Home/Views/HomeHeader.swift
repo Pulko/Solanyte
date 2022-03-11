@@ -31,7 +31,7 @@ struct HomeHeader: View {
         }
       }
     }
-    .padding()
+    .padding(.horizontal)
   }
 }
 
