@@ -61,7 +61,7 @@ class PortfolioViewModel: ObservableObject {
       
       walletService.$coins
         .receive(on: DispatchQueue.main)
-        .map(filterAndSortCoins)
+        .map(sortCoins)
         .sink { [weak self] (returnedCoins: Array<CoinModel>) in
           self?.coins = returnedCoins.uniqued()
           
@@ -83,10 +83,9 @@ class PortfolioViewModel: ObservableObject {
     }
   }
   
-  private func filterAndSortCoins(coins: [CoinModel]) -> [CoinModel] {
+  private func sortCoins(coins: [CoinModel]) -> [CoinModel] {
     var cloneCoins = coins
     
-    SortManager.filterCoins(coins: &cloneCoins, filter: false)
     SortManager.sortCoins(coins: &cloneCoins)
     return cloneCoins
   }

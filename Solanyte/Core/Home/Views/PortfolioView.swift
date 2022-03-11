@@ -44,7 +44,6 @@ extension PortfolioView {
             saveButtonPressed()
             presentationMode.wrappedValue.dismiss()
           }) {
-            Image(systemName: "square.and.arrow.down")
             Text("save".capitalized)
               .foregroundColor(.theme.accent)
               .fontWeight(.bold)
@@ -74,7 +73,6 @@ extension PortfolioView {
           .padding(.top)
         }
         
-        
         HStack {
           if portfolioVm.isReady {
             savePortfolioButton
@@ -83,7 +81,6 @@ extension PortfolioView {
               Button(action: {
                 portfolioVm.fetchWalletByAddress()
               }, label: {
-                Image(systemName: "personalhotspot")
                 Text("fetch".capitalized)
                   .foregroundColor(.theme.accent)
                   .fontWeight(.bold)
@@ -97,7 +94,6 @@ extension PortfolioView {
                   portfolioVm.walletAddress = UIPasteboard.general.string ?? ""
                 }
               }, label: {
-                Image(systemName: "doc.on.clipboard")
                 Text("paste".capitalized)
                   .foregroundColor(.theme.accent)
                   .fontWeight(.bold)
@@ -146,6 +142,6 @@ extension PortfolioView {
   
   private func saveButtonPressed() {
     vm.updatePortfolio(coins: portfolioVm.coins)
-    vm.updateWallet(key: portfolioVm.walletAddress)
+    vm.updateWallet(key: portfolioVm.walletAddress, balance: portfolioVm.coins.reduce(0) { $0 + $1.currentHoldingsValue })
   }
 }

@@ -17,7 +17,7 @@ struct HomeHeader: View {
   }
   
   var body: some View {
-    VStack {
+    VStack(spacing: 0) {
       navigation
       
       if fromWallet {
@@ -25,9 +25,11 @@ struct HomeHeader: View {
           HStack {
             hideZeroBalance
             Spacer()
+            walletKey
+            Spacer()
             updateButton
           }
-          .padding([.bottom, .horizontal])
+          .padding(.horizontal)
         }
       }
     }
@@ -36,6 +38,15 @@ struct HomeHeader: View {
 }
 
 extension HomeHeader {
+  private var walletKey: some View {
+    Text(vm.walletEntity?.key ?? "sdf")
+      .foregroundColor(.theme.secondaryText)
+      .frame(width: 100)
+      .lineLimit(1)
+      .truncationMode(.middle)
+      .animation(.none)
+  }
+  
   private var updateButton: some View {
     CircleButtonView("arrow.triangle.2.circlepath", rotate: vm.isLoading) {
       withAnimation(.linear(duration: 2)) {
@@ -72,13 +83,8 @@ extension HomeHeader {
           .fontWeight(.heavy)
           .foregroundColor(.theme.accent)
           .animation(.none)
-        if (fromWallet) {
-          Text(vm.walletEntity?.key ?? "")
-            .foregroundColor(.theme.secondaryText)
-            .frame(width: 100)
-            .lineLimit(1)
-            .truncationMode(.middle)
-            .animation(.none)
+        if fromWallet {
+          walletBalanceDelta
         }
       }
       
@@ -87,6 +93,23 @@ extension HomeHeader {
       walletButtonElement
     }
     .padding()
+  }
+  
+  private var walletBalanceDelta: some View {
+    let balance = vm.walletEntity?.balance ?? 0
+    let delta = (vm.portfolioValue - balance)
+    
+    return (
+      HStack {
+        Image(systemName: "triangle.fill")
+          .font(.caption2)
+          .rotationEffect(Angle.init(degrees: delta >= 0 ? 0 : 180))
+        Text(delta.asFloatWith4Decimals())
+          .font(.caption)
+      }
+        .foregroundColor(delta >= 0 ? Color.theme.green : Color.theme.red)
+        .opacity(balance == 0 ? 0 : 1)
+    )
   }
   
   private var walletButtonElement: some View {

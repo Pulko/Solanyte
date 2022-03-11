@@ -63,8 +63,14 @@ class HomeViewModel: ObservableObject {
     portfolioDataService.updatePortfolio(coins: coins)
   }
   
-  func updateWallet(key: String) {
-    portfolioDataService.updateWallet(key: key, balance: 0)
+  func updateWallet(key: String, balance: Double) {
+    portfolioDataService.updateWallet(key: key, balance: balance)
+  }
+  
+  func resetWalletValue() {
+    if let key = self.walletEntity?.key {
+      portfolioDataService.updateWallet(key: key, balance: self.portfolioValue)
+    }
   }
   
   func reloadData() {

@@ -19,6 +19,7 @@ struct Solanyte: App {
     UITableView.appearance().backgroundColor = UIColor.clear
     UINavigationBar.appearance().tintColor = UIColor(Color.theme.accent)
     UITextView.appearance().backgroundColor = UIColor.clear
+    UITextField.appearance().backgroundColor = UIColor(Color.theme.background)
   }
   
   var body: some Scene {

@@ -52,16 +52,17 @@ class PortfolioDataService {
 
       if let entity = savedEntities.first(where: { $0.coinID == coin.id }) {
         if amount > 0 {
-          update(entity: entity, amount: amount)
+          updatePortfolioEntity(entity: entity, amount: amount)
         } else {
-          delete(entity: entity)
+          deletePortfolioEntity(entity: entity)
         }
       } else {
-        add(coin: coin, amount: amount)
+        addPortfolioEntity(coin: coin, amount: amount)
       }
     }
     
-    applyChanges()
+    save(container: container)
+    getPortfolio()
   }
   
   func updateWallet(key: String, balance: Double = 0) {
@@ -70,6 +71,9 @@ class PortfolioDataService {
     } else {
       addWalletEntity(balance: balance, key: key)
     }
+    
+    save(container: walletContainer)
+    getWallet()
   }
   
   func deleteAll() -> Void {
@@ -81,6 +85,7 @@ class PortfolioDataService {
     savedEntities.removeAll()
     savedCoins.removeAll()
     self.save(container: container)
+    self.save(container: walletContainer)
   }
   
   func reload() -> Void {
@@ -125,23 +130,17 @@ class PortfolioDataService {
   private func updateWalletEntity(entity: WalletEntity, balance: Double, key: String) {
     entity.balance = balance
     entity.key = key
-
-    save(container: walletContainer)
-    getWallet()
   }
   
   private func addWalletEntity(balance: Double, key: String) {
     let entity = WalletEntity(context: walletContainer.viewContext)
     entity.balance = balance
     entity.key = key
-    
-    save(container: walletContainer)
-    getWallet()
   }
   
   // Portfolio
   
-  private func add(coin: CoinModel, amount: Double) -> Void {
+  private func addPortfolioEntity(coin: CoinModel, amount: Double) -> Void {
     let entity = PortfolioEntity(context: container.viewContext)
     entity.coinID = coin.id
     entity.amount = amount
@@ -149,18 +148,13 @@ class PortfolioDataService {
     save(container: container)
   }
   
-  private func update(entity: PortfolioEntity, amount: Double) {
+  private func updatePortfolioEntity(entity: PortfolioEntity, amount: Double) {
     entity.amount = amount
 
     save(container: container)
   }
   
-  private func applyChanges() {
-    save(container: container)
-    getPortfolio()
-  }
-  
-  private func delete(entity: PortfolioEntity) {
+  private func deletePortfolioEntity(entity: PortfolioEntity) {
     container.viewContext.delete(entity)
     
     save(container: container)

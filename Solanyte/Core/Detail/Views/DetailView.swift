@@ -40,7 +40,6 @@ struct DetailView: View {
            let urlLink = URL(string: websiteUrl) {
           getLinksSection(title: "Homepage", url: urlLink)
         }
-        
       }
       .padding()
     }
@@ -99,7 +98,6 @@ extension DetailView {
           .fontWeight(.bold)
           .font(.title)
           .foregroundColor(.theme.accent)
-          .frame(width: 200)
           .lineLimit(1)
           .truncationMode(.tail)
       }
