@@ -20,7 +20,6 @@ struct SolscanApiService {
   
   static func fetchTokenDataByMint(
     mint: PublicKey,
-    amount: TokenAmount?,
     receiveValue: @escaping (TokenData) -> Void
   ) -> AnyCancellable {
     NetworkingManager.download(url: url.tokenDataByMint(mint.base58EncodedString))

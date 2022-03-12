@@ -51,7 +51,6 @@ class WalletService {
           
           SolscanApiService.fetchTokenDataByMint(
             mint: mint,
-            amount: wallet.ammount,
             receiveValue: { [weak self] tokenData in
               self?.tokens.append(tokenData.assignAmount(amount: wallet.ammount))
             })
