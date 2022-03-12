@@ -10,7 +10,7 @@ import SwiftUI
 struct HomeView: View {
   @EnvironmentObject private var vm: HomeViewModel
   
-  @State private var showPortfolioView: Bool = false
+  @State private var showWalletView: Bool = false
   @State private var showSettingsView: Bool = false
   
   private var isContent: Bool {
@@ -25,14 +25,14 @@ struct HomeView: View {
     ZStack {
       // background
       background
-        .sheet(isPresented: $showPortfolioView, content: {
-          PortfolioView()
+        .sheet(isPresented: $showWalletView, content: {
+          WalletView()
         })
       // content
       VStack {
         HomeHeader(
           showSettingsView: $showSettingsView,
-          showPortfolioView: $showPortfolioView
+          showWalletView: $showWalletView
         )
         
         if isContent {

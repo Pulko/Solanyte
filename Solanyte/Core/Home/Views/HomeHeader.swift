@@ -10,7 +10,7 @@ import SwiftUI
 struct HomeHeader: View {
   @EnvironmentObject private var vm: HomeViewModel
   @Binding var showSettingsView: Bool
-  @Binding var showPortfolioView: Bool
+  @Binding var showWalletView: Bool
   
   private var fromWallet: Bool {
     vm.fromWallet
@@ -123,7 +123,7 @@ extension HomeHeader {
       } else {
         CircleButtonView(name: "solana-logo") {
           withAnimation(.spring()) {
-            showPortfolioView.toggle()
+            showWalletView.toggle()
           }
         }
         .padding(.top)
@@ -143,7 +143,7 @@ struct HomeHeader_Previews: PreviewProvider {
   static var previews: some View {
     HomeHeader(
       showSettingsView: .constant(false),
-      showPortfolioView: .constant(false)
+      showWalletView: .constant(false)
     )
       .environmentObject(dev.homeVM)
       .preferredColorScheme(.dark)

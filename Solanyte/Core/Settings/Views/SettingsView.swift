@@ -45,7 +45,13 @@ struct SettingsView: View {
         .padding()
       }
       .toolbar {
-        ToolbarItem(placement: .navigationBarTrailing) {
+        ToolbarItem(placement: .navigationBarLeading) {
+          Text("Settings")
+            .font(.title)
+            .foregroundColor(.theme.accent)
+            .bold()
+        }
+        ToolbarItem(placement: .primaryAction) {
           XmarkButton()
         }
       }

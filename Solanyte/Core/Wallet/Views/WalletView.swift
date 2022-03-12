@@ -1,5 +1,5 @@
 //
-//  PortfolioView.swift
+//  WalletView.swift
 //  Solanyte
 //
 //  Created by Фёдор Ткаченко on 13.12.21.
@@ -8,10 +8,10 @@
 import SwiftUI
 import Solana
 
-struct PortfolioView: View {
+struct WalletView: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject private var vm: HomeViewModel
-  @StateObject private var portfolioVm = PortfolioViewModel()
+  @StateObject private var portfolioVm = WalletViewModel()
   
   var body: some View {
     NavigationView {
@@ -22,8 +22,13 @@ struct PortfolioView: View {
         })
           .padding(30)
       }
-      .navigationTitle("Add wallet")
       .toolbar {
+        ToolbarItem(placement: .navigationBarLeading) {
+          Text("Add wallet")
+            .font(.title)
+            .foregroundColor(.theme.accent)
+            .bold()
+        }
         ToolbarItem(placement: .navigationBarTrailing) {
           XmarkButton()
         }
@@ -35,7 +40,7 @@ struct PortfolioView: View {
   }
 }
 
-extension PortfolioView {
+extension WalletView {
   private var savePortfolioButton: some View {
     VStack {
       HStack(alignment: .center) {

@@ -1,5 +1,5 @@
 //
-//  PortfolioViewModel.swift
+//  WalletViewModel.swift
 //  Solanyte
 //
 //  Created by Фёдор Ткаченко on 24.01.22.
@@ -9,7 +9,7 @@ import Foundation
 import Combine
 import Solana
 
-class PortfolioViewModel: ObservableObject {
+class WalletViewModel: ObservableObject {
   @Published var isLoading: Bool = false
   @Published var isError: Bool = false
   @Published var isReady: Bool = false
