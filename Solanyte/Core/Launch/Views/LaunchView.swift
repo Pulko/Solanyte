@@ -19,7 +19,7 @@ struct LaunchView: View {
   
   var body: some View {
     ZStack {
-      Color.launch.background.ignoresSafeArea()
+      Color.theme.background.ignoresSafeArea()
       Image("solanyte-transparent")
         .resizable()
         .frame(width: 100, height: 100)
@@ -30,7 +30,7 @@ struct LaunchView: View {
               Text(loadingText[index])
                 .font(.headline)
                 .fontWeight(.heavy)
-                .foregroundColor(.launch.accent)
+                .foregroundColor(.theme.accent)
                 .offset(x: counter == index ? -1 : 0)
             }
           }
