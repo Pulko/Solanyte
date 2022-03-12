@@ -11,6 +11,7 @@ struct HomeHeader: View {
   @EnvironmentObject private var vm: HomeViewModel
   @Binding var showSettingsView: Bool
   @Binding var showWalletView: Bool
+  @Binding var showRemoveWalletSheet: Bool
   
   private var fromWallet: Bool {
     vm.fromWallet
@@ -117,7 +118,7 @@ extension HomeHeader {
       if fromWallet {
         CircleButtonView("trash") {
           withAnimation(.spring()) {
-            vm.removeData()
+            showRemoveWalletSheet = true
           }
         }
       } else {
@@ -143,7 +144,8 @@ struct HomeHeader_Previews: PreviewProvider {
   static var previews: some View {
     HomeHeader(
       showSettingsView: .constant(false),
-      showWalletView: .constant(false)
+      showWalletView: .constant(false),
+      showRemoveWalletSheet: .constant(false)
     )
       .environmentObject(dev.homeVM)
       .preferredColorScheme(.dark)

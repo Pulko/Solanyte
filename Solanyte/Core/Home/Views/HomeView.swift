@@ -12,6 +12,7 @@ struct HomeView: View {
   
   @State private var showWalletView: Bool = false
   @State private var showSettingsView: Bool = false
+  @State private var showRemoveWalletSheet: Bool = false
   
   private var isContent: Bool {
     coinsToRender.count > 0
@@ -32,7 +33,8 @@ struct HomeView: View {
       VStack {
         HomeHeader(
           showSettingsView: $showSettingsView,
-          showWalletView: $showWalletView
+          showWalletView: $showWalletView,
+          showRemoveWalletSheet: $showRemoveWalletSheet
         )
         
         if isContent {
@@ -41,6 +43,7 @@ struct HomeView: View {
         }
         
         Spacer(minLength: 0)
+        RemoveWalletAlert(showRemoveWalletSheet: $showRemoveWalletSheet)
       }
       .sheet(isPresented: $showSettingsView, content: {
         SettingsView()
