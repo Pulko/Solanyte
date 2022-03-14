@@ -1,3 +1,3 @@
-struct CryptoTrackerTutorial {
+struct Solanyte {
     var text = "Hello, World!"
 }

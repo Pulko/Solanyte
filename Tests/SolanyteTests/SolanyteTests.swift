@@ -1,11 +1,11 @@
     import XCTest
-    @testable import CryptoTrackerTutorial
+    @testable import Solanyte
 
-    final class CryptoTrackerTutorialTests: XCTestCase {
+    final class SolanyteTests: XCTestCase {
         func testExample() {
             // This is an example of a functional test case.
             // Use XCTAssert and related functions to verify your tests produce the correct
             // results.
-            XCTAssertEqual(CryptoTrackerTutorial().text, "Hello, World!")
+            XCTAssertEqual(Solanyte().text, "Hello, World!")
         }
     }
