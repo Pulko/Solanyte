@@ -82,11 +82,12 @@ extension CoinRowView {
       if coin.currentHoldingsValue > 0 {
         Text(coin.currentHoldingsValue.asCurrencyWith2Decimals())
           .bold()
+          .foregroundColor(.theme.accent)
         Text(Double(coin.currentHoldings ?? 0).asFloatWith4Decimals())
+          .foregroundColor(.theme.secondaryText)
           .font(.caption2)
           .bold()
       }
     }
-    .foregroundColor(.theme.accent)
   }
 }

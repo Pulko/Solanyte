@@ -35,9 +35,15 @@ class SortManager {
         return false
       }
     case .rank:
-      coins.sort { $0.rank > $1.rank }
+      coins.sort {
+        if ($0.rank == 0) { return false }
+        return $0.rank < $1.rank
+      }
     case .rankReversed:
-      coins.sort { $0.rank < $1.rank }
+      coins.sort {
+        if ($0.rank == 0) { return false }
+        return $0.rank > $1.rank
+      }
     case .holdings:
       coins.sort { $0.currentHoldingsValue > $1.currentHoldingsValue }
     case .holdingsReversed:

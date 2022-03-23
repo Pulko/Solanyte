@@ -43,6 +43,31 @@ extension Double {
   
   /// Converts Double into a Floar number as a String with 4 decimal places
   /// ```
+  /// Converts 1234.56 to "1,234.560000"
+  /// Converts 12.34562 to "12.345620"
+  /// Converts 0.123456 to "0.123456"
+  /// ```
+  func asFloatWith6Decimals() -> String {
+    let number = NSNumber(value: self)
+    
+    return holdingsFormatter6.string(from: number) ?? "$0.0000"
+  }
+  
+  /// Converts Double into a Float with 4 decimal places
+  /// ```
+  /// Converts 12.3456234234 to 12.345623
+  /// ```
+  private var holdingsFormatter6: NumberFormatter {
+    let formatter = NumberFormatter()
+    
+    formatter.minimumFractionDigits = 3
+    formatter.maximumFractionDigits = 6
+    
+    return formatter
+  }
+  
+  /// Converts Double into a Floar number as a String with 4 decimal places
+  /// ```
   /// Converts 1234.56 to "1,234.5600"
   /// Converts 12.34562 to "12.3456"
   /// Converts 0.123456 to "0.1234"
@@ -50,17 +75,17 @@ extension Double {
   func asFloatWith4Decimals() -> String {
     let number = NSNumber(value: self)
     
-    return holdingsFormatter.string(from: number) ?? "$0.0000"
+    return holdingsFormatter4.string(from: number) ?? "$0.0000"
   }
   
   /// Converts Double into a Float with 4 decimal places
   /// ```
   /// Converts 12.3456234234 to 12.3456
   /// ```
-  private var holdingsFormatter: NumberFormatter {
+  private var holdingsFormatter4: NumberFormatter {
     let formatter = NumberFormatter()
     
-    formatter.minimumFractionDigits = 4
+    formatter.minimumFractionDigits = 2
     formatter.maximumFractionDigits = 4
     
     return formatter

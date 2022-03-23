@@ -31,19 +31,22 @@ struct HomeView: View {
         })
       // content
       VStack {
-        HomeHeader(
-          showSettingsView: $showSettingsView,
-          showWalletView: $showWalletView,
-          showRemoveWalletSheet: $showRemoveWalletSheet
-        )
-        
-        if isContent {
-          columnTitles
-          coinsList
+        ScrollView {
+          HomeHeader(
+            showSettingsView: $showSettingsView,
+            showWalletView: $showWalletView,
+            showRemoveWalletSheet: $showRemoveWalletSheet
+          )
+          
+          if isContent {
+            columnTitles
+            coinsList
+          }
+          
+          Spacer(minLength: 0)
+          RemoveWalletAlert(showRemoveWalletSheet: $showRemoveWalletSheet)
         }
-        
-        Spacer(minLength: 0)
-        RemoveWalletAlert(showRemoveWalletSheet: $showRemoveWalletSheet)
+        .transition(.move(edge: .leading))
       }
       .sheet(isPresented: $showSettingsView, content: {
         SettingsView()
@@ -59,8 +62,8 @@ extension HomeView {
   }
   
   private var coinsList: some View {
-    List {
-      ForEach(coinsToRender) { coin in
+    ForEach(coinsToRender) { coin in
+      GroupBox {
         NavigationLink(
           destination: NavigationLazyView(DetailView(coin: coin)),
           label: {
@@ -70,25 +73,40 @@ extension HomeView {
           .listRowBackground(Color.theme.background)
           .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))
       }
+      .padding(.horizontal, 10)
     }
-    .listStyle(PlainListStyle())
-    .transition(.move(edge: .leading))
   }
   
   private var columnTitles: some View {
-    HStack{
-      ColumnSortingTitle("Coin", option: .rank, optionReversed: .rankReversed)
-      
-      Spacer()
-      
-      ColumnSortingTitle("Holdings", option: .holdings, optionReversed: .holdingsReversed)
-      
-      ColumnSortingTitle("Price", option: .price, optionReversed: .priceReversed)
-        .lastColumnStyled()
+    var fromWallet: Bool {
+      vm.fromWallet
     }
-    .font(.caption)
-    .foregroundColor(.theme.secondaryText)
-    .padding(.horizontal, 10)
+    
+    var sortings = [
+      (title: "rank", option: SortOption.rank),
+      (title: "price", option: SortOption.price),
+    ]
+    
+    if (vm.fromWallet) {
+      sortings.insert(
+        (title: "balance", option: SortOption.holdings),
+        at: 1
+      )
+    }
+    
+    return (
+      VStack {
+        Picker("Sort", selection: $vm.sortOption) {
+          ForEach(sortings, id: \.title) { sorting in
+            Text(sorting.title.uppercased())
+              .tag(sorting.option)
+          }
+        }
+        .pickerStyle(SegmentedPickerStyle())
+        .padding(.horizontal, 10)
+        .padding(.bottom)
+      }
+    )
   }
 }
 

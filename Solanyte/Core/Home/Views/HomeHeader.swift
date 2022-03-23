@@ -40,7 +40,7 @@ struct HomeHeader: View {
 
 extension HomeHeader {
   private var walletKey: some View {
-    Text(vm.walletEntity?.key ?? "sdf")
+    Text(vm.walletEntity?.key ?? "")
       .foregroundColor(.theme.secondaryText)
       .frame(width: 100)
       .lineLimit(1)
@@ -69,12 +69,16 @@ extension HomeHeader {
     .padding(.vertical)
   }
   
+  private var settings: some View {
+    CircleButtonView("ellipsis") {
+      showSettingsView.toggle()
+    }
+    .animation(.none)
+  }
+  
   private var navigation: some View {
     HStack {
-      CircleButtonView("ellipsis") {
-        showSettingsView.toggle()
-      }
-      .animation(.none)
+      settings
       
       Spacer()
       
@@ -105,7 +109,7 @@ extension HomeHeader {
         Image(systemName: "triangle.fill")
           .font(.caption2)
           .rotationEffect(Angle.init(degrees: delta >= 0 ? 0 : 180))
-        Text(delta.asFloatWith4Decimals())
+        Text(delta.asFloatWith6Decimals())
           .font(.caption)
       }
         .foregroundColor(delta >= 0 ? Color.theme.green : Color.theme.red)
@@ -121,6 +125,7 @@ extension HomeHeader {
             showRemoveWalletSheet = true
           }
         }
+        .padding(.top)
       } else {
         CircleButtonView(name: "solana-logo") {
           withAnimation(.spring()) {
@@ -129,12 +134,10 @@ extension HomeHeader {
         }
         .padding(.top)
       }
-      if !fromWallet {
-        Text("Add wallet")
-          .foregroundColor(.theme.accent)
-          .fontWeight(.light)
-          .font(.caption2)
-      }
+      Text("Wallet")
+        .foregroundColor(.theme.accent)
+        .fontWeight(.light)
+        .font(.caption2)
     }
   }
 }
