@@ -13,6 +13,10 @@ struct Solanyte: App {
   
   @State private var showLaunchView: Bool = true
   
+  private let homeTabKey = 1
+  private let walletTabKey = 2
+  private let settingsTabKey = 3
+  
   init() {
     UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor(Color.theme.accent)]
     UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: UIColor(Color.theme.accent)]
@@ -25,11 +29,40 @@ struct Solanyte: App {
   var body: some Scene {
     WindowGroup {
       ZStack {
-        NavigationView {
-          HomeView()
-            .environmentObject(vm)
-            .navigationBarHidden(true)
+        TabView(selection: $vm.tabView) {
+          
+          NavigationView {
+            HomeView()
+              .navigationBarHidden(true)
+          }
+          .tabItem {
+            Image(systemName: "house")
+            Text("Home".uppercased())
+          }
+          .tag(homeTabKey)
+
+          NavigationView {
+            WalletView()
+              .navigationBarHidden(true)
+          }
+          .tabItem {
+            Image(systemName: "server.rack")
+            Text("Wallet".uppercased())
+          }
+          .tag(walletTabKey)
+
+          NavigationView {
+            SettingsView()
+              .navigationBarHidden(true)
+          }
+          .tabItem {
+            Image(systemName: "slider.horizontal.3")
+            Text("Settings".uppercased())
+          }
+          .tag(settingsTabKey)
+          
         }
+        .environmentObject(vm)
         .navigationViewStyle(StackNavigationViewStyle())
         .opacity(showLaunchView ? 0.0 : 1.0)
         

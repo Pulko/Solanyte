@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HomeHeader: View {
   @EnvironmentObject private var vm: HomeViewModel
-  @Binding var showSettingsView: Bool
+  @Binding var showInfoView: Bool
   @Binding var showWalletView: Bool
   @Binding var showRemoveWalletSheet: Bool
   
@@ -24,11 +24,11 @@ struct HomeHeader: View {
       if fromWallet {
         withAnimation {
           HStack {
-            hideZeroBalance
+            updateButton
             Spacer()
             walletKey
             Spacer()
-            updateButton
+            hideZeroBalance
           }
           .padding(.horizontal)
         }
@@ -71,7 +71,7 @@ extension HomeHeader {
   
   private var settings: some View {
     CircleButtonView("ellipsis") {
-      showSettingsView.toggle()
+      showInfoView.toggle()
     }
     .animation(.none)
   }
@@ -82,7 +82,7 @@ extension HomeHeader {
       
       Spacer()
       
-      VStack {
+      VStack(alignment: .trailing) {
         Text(fromWallet ? vm.portfolioValue.asCurrencyWith2Decimals() : "Solanyte")
           .font(.title)
           .fontWeight(.heavy)
@@ -93,11 +93,11 @@ extension HomeHeader {
         }
       }
       
-      Spacer()
+//      Spacer()
       
-      walletButtonElement
+//      walletButtonElement
     }
-    .padding()
+    .padding(.horizontal)
   }
   
   private var walletBalanceDelta: some View {
@@ -117,36 +117,36 @@ extension HomeHeader {
     )
   }
   
-  private var walletButtonElement: some View {
-    VStack {
-      if fromWallet {
-        CircleButtonView("trash") {
-          withAnimation(.spring()) {
-            showRemoveWalletSheet = true
-          }
-        }
-        .padding(.top)
-      } else {
-        CircleButtonView(name: "solana-logo") {
-          withAnimation(.spring()) {
-            showWalletView.toggle()
-          }
-        }
-        .padding(.top)
-      }
-      Text("Wallet")
-        .foregroundColor(.theme.accent)
-        .fontWeight(.light)
-        .font(.caption2)
-    }
-  }
+//  private var walletButtonElement: some View {
+//    VStack {
+//      if fromWallet {
+//        CircleButtonView("trash") {
+//          withAnimation(.spring()) {
+//            showRemoveWalletSheet = true
+//          }
+//        }
+//        .padding(.top)
+//      } else {
+//        CircleButtonView(name: "solana-logo") {
+//          withAnimation(.spring()) {
+//            showWalletView.toggle()
+//          }
+//        }
+//        .padding(.top)
+//      }
+//      Text("Wallet")
+//        .foregroundColor(.theme.accent)
+//        .fontWeight(.light)
+//        .font(.caption2)
+//    }
+//  }
 }
 
 
 struct HomeHeader_Previews: PreviewProvider {
   static var previews: some View {
     HomeHeader(
-      showSettingsView: .constant(false),
+      showInfoView: .constant(false),
       showWalletView: .constant(false),
       showRemoveWalletSheet: .constant(false)
     )

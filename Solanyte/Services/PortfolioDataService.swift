@@ -164,21 +164,24 @@ class PortfolioDataService {
   
   private func handleSavedEntities() -> Void {
     let ids = self.savedEntities.compactMap { $0.coinID }.uniqued().filter { $0 != "" }
-    fromWallet = !ids.isEmpty
-    let tryMap = { (models: [CoinModel]) -> [CoinModel] in
-      models.map { (model: CoinModel) in
-        let amount = self.savedEntities.first(where: { $0.coinID == model.id })?.amount ?? 0
-        
-        return model.updateHoldings(amount: amount)
+
+    if (!ids.isEmpty) {
+      fromWallet = !ids.isEmpty
+      let tryMap = { (models: [CoinModel]) -> [CoinModel] in
+        models.map { (model: CoinModel) in
+          let amount = self.savedEntities.first(where: { $0.coinID == model.id })?.amount ?? 0
+          
+          return model.updateHoldings(amount: amount)
+        }
       }
+      
+      CoingeckoApiService.fetchCoinModelsByIds(
+        ids: ids,
+        tryMap: tryMap,
+        receiveValue: { [weak self] coinModels in
+          self?.savedCoins = coinModels
+        })
+        .store(in: &self.cancellables)
     }
-    
-    CoingeckoApiService.fetchCoinModelsByIds(
-      ids: ids,
-      tryMap: tryMap,
-      receiveValue: { [weak self] coinModels in
-        self?.savedCoins = coinModels
-      })
-      .store(in: &self.cancellables)
   }
 }

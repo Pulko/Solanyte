@@ -44,18 +44,13 @@ struct CircleButtonView: View {
   }
   
   var body: some View {
-    imageElement()
-      .frame(width: width / 2, height: height / 2, alignment: .center)
-      .rotationEffect(Angle.degrees(rotate ? 360 : 0), anchor: .center)
-      .foregroundColor(.theme.accent)
-      .font(.headline)
-      .frame(width: width, height: height, alignment: .center)
-      .background(
-        Rectangle()
-          .foregroundColor(.theme.secondaryText.opacity(0.1))
-          .cornerRadius(CGFloat(20))
-      )
-      .onTapGesture(perform: action)
+    AccentButton(perform: action) {
+      imageElement()
+        .frame(width: width / 2, height: height / 2, alignment: .center)
+        .rotationEffect(Angle.degrees(rotate ? 360 : 0), anchor: .center)
+        .foregroundColor(.theme.accent)
+        .font(.headline)
+    }
   }
 }
 

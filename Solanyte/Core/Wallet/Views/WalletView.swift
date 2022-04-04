@@ -13,29 +13,28 @@ struct WalletView: View {
   @EnvironmentObject private var vm: HomeViewModel
   @StateObject private var portfolioVm = WalletViewModel()
   
+  private var currentWalletAddress: String {
+    portfolioVm.walletAddress == "" ? vm.walletEntity?.key ?? "" : portfolioVm.walletAddress
+  }
+  
   var body: some View {
     NavigationView {
       VStack {
         VStack(spacing: 0, content: {
           walletAddressInput
           Spacer()
+          CircleButtonView("trash") {
+            withAnimation(.spring()) {
+              portfolioVm.deleteAll()
+              vm.removeData()
+              vm.tabView = 1
+            }
+          }
+          Spacer()
         })
           .padding(30)
       }
-      .toolbar {
-        ToolbarItem(placement: .navigationBarLeading) {
-          Text("Add wallet")
-            .font(.title)
-            .foregroundColor(.theme.accent)
-            .bold()
-        }
-        ToolbarItem(placement: .navigationBarTrailing) {
-          XmarkButton()
-        }
-      }
-      .onAppear {
-        portfolioVm.deleteAll()
-      }
+      .navigationBarHidden(true)
     }
   }
 }
@@ -48,8 +47,9 @@ extension WalletView {
           Button(action: {
             saveButtonPressed()
             presentationMode.wrappedValue.dismiss()
+            vm.tabView = 1
           }) {
-            Text("save".capitalized)
+            Text("save".uppercased())
               .foregroundColor(.theme.accent)
               .fontWeight(.bold)
           }
@@ -62,9 +62,8 @@ extension WalletView {
   private var walletAddressInput: some View {
     GroupBox {
       VStack {
-        if portfolioVm.isReady {
+        if portfolioVm.isReady || vm.walletEntity?.key != nil {
           walletDisplayData
-            .padding(.top)
         } else {
           HStack {
             Image("solana-logo")
@@ -75,31 +74,30 @@ extension WalletView {
             TextField("Solana wallet address", text: $portfolioVm.walletAddress)
               .textFieldStyle(RoundedBorderTextFieldStyle())
           }
-          .padding(.top)
         }
         
         HStack {
           if portfolioVm.isReady {
             savePortfolioButton
           } else {
-            if !portfolioVm.walletAddress.isEmpty {
+            if !currentWalletAddress.isEmpty {
               Button(action: {
                 portfolioVm.fetchWalletByAddress()
               }, label: {
-                Text("fetch".capitalized)
+                Text("fetch".uppercased())
                   .foregroundColor(.theme.accent)
                   .fontWeight(.bold)
               })
                 .padding()
             }
             
-            if portfolioVm.walletAddress.isEmpty {
+            if currentWalletAddress.isEmpty {
               Button(action: {
                 if UIPasteboard.general.hasStrings {
                   portfolioVm.walletAddress = UIPasteboard.general.string ?? ""
                 }
               }, label: {
-                Text("paste".capitalized)
+                Text("paste".uppercased())
                   .foregroundColor(.theme.accent)
                   .fontWeight(.bold)
               })
@@ -129,16 +127,10 @@ extension WalletView {
       HStack {
         Text("Wallet address:")
         Spacer()
-        Text(portfolioVm.walletAddress)
+        Text(currentWalletAddress)
           .frame(width: 100)
           .lineLimit(1)
           .truncationMode(.middle)
-      }
-      Divider()
-      HStack {
-        Text("Coins found:")
-        Spacer()
-        Text("\(portfolioVm.coins.count)")
       }
     }
   }

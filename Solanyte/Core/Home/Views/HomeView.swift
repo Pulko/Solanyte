@@ -11,7 +11,7 @@ struct HomeView: View {
   @EnvironmentObject private var vm: HomeViewModel
   
   @State private var showWalletView: Bool = false
-  @State private var showSettingsView: Bool = false
+  @State private var showInfoView: Bool = false
   @State private var showRemoveWalletSheet: Bool = false
   
   private var isContent: Bool {
@@ -23,34 +23,49 @@ struct HomeView: View {
   }
   
   var body: some View {
-    ZStack {
-      // background
-      background
-        .sheet(isPresented: $showWalletView, content: {
-          WalletView()
-        })
-      // content
-      VStack {
-        ScrollView {
-          HomeHeader(
-            showSettingsView: $showSettingsView,
-            showWalletView: $showWalletView,
-            showRemoveWalletSheet: $showRemoveWalletSheet
-          )
-          
-          if isContent {
-            columnTitles
-            coinsList
+    GeometryReader { geometry in
+      ZStack {
+        // background
+        background
+          .sheet(isPresented: $showWalletView, content: {
+            WalletView()
+          })
+        // content
+        VStack {
+          ScrollView {
+            HomeHeader(
+              showInfoView: $showInfoView,
+              showWalletView: $showWalletView,
+              showRemoveWalletSheet: $showRemoveWalletSheet
+            )
+              .padding(.top)
+            
+            if isContent {
+              columnTitles
+              coinsList
+                .padding(.bottom)
+            }
+            
+            if !isContent {
+              VStack {
+                Spacer(minLength: geometry.size.height / 2)
+                AccentButton(perform: { vm.tabView = 2 }) {
+                  Text("Add wallet".uppercased())
+                    .foregroundColor(.theme.accent)
+                    .bold()
+                }
+              }
+            }
+            
+            Spacer(minLength: 0)
+            RemoveWalletAlert(showRemoveWalletSheet: $showRemoveWalletSheet)
           }
-          
-          Spacer(minLength: 0)
-          RemoveWalletAlert(showRemoveWalletSheet: $showRemoveWalletSheet)
+          .transition(.move(edge: .leading))
         }
-        .transition(.move(edge: .leading))
+        .sheet(isPresented: $showInfoView, content: {
+          InfoView()
+        })
       }
-      .sheet(isPresented: $showSettingsView, content: {
-        SettingsView()
-      })
     }
   }
 }
@@ -113,8 +128,10 @@ extension HomeView {
 struct HomeView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationView {
-      HomeView()
-        .navigationBarHidden(true)
+      TabView(selection: .constant(1)) {
+        HomeView().tabItem { Text("Home") }.tag(1)
+      }
+      .navigationBarHidden(true)
     }
     .environmentObject(dev.homeVM)
     .preferredColorScheme(.light)

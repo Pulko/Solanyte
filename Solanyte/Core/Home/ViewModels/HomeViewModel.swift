@@ -20,6 +20,8 @@ class HomeViewModel: ObservableObject {
   @Published var isAboveZero: Bool = false
   @Published var sortOption: SortOption = .rank
   
+  @Published var tabView = 1
+  
   private let portfolioDataService = PortfolioDataService()
   private var cancellables = Set<AnyCancellable>()
   
