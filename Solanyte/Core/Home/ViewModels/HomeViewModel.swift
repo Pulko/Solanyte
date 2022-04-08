@@ -17,6 +17,8 @@ class HomeViewModel: ObservableObject {
   @Published var walletEntity: WalletEntity? = nil
   @Published var portfolioValue: Double = 0
   
+  @Published var savedWalletEntities: [WalletEntity] = []
+  
   @Published var isAboveZero: Bool = false
   @Published var sortOption: SortOption = .rank
   
@@ -44,6 +46,13 @@ class HomeViewModel: ObservableObject {
         if let returnedWallet = returnedWallet {
           self?.walletEntity = returnedWallet
         }
+      }
+      .store(in: &cancellables)
+    
+    portfolioDataService.$savedWallets
+      .sink { [weak self] (returnedWallets: [WalletEntity]) in
+        self?.savedWalletEntities = returnedWallets
+        print(returnedWallets)
       }
       .store(in: &cancellables)
     

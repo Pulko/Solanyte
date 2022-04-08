@@ -21,6 +21,7 @@ class PortfolioDataService {
   
   @Published var savedEntities: [PortfolioEntity] = []
   @Published var savedWallet: WalletEntity? = nil
+  @Published var savedWallets: [WalletEntity] = []
   @Published var savedCoins: [CoinModel] = []
   @Published var fromWallet: Bool = false
   
@@ -42,7 +43,7 @@ class PortfolioDataService {
     }
     
     self.getPortfolio()
-    self.getWallet()
+    self.getWallets()
   }
   
   // MARK: Public  
@@ -66,14 +67,20 @@ class PortfolioDataService {
   }
   
   func updateWallet(key: String, balance: Double = 0) {
-    if let entity = savedWallet {
+    let existingEntity = savedWallets.first { $0.key == key }
+    
+    if let entity = existingEntity {
       updateWalletEntity(entity: entity, balance: balance, key: key)
     } else {
-      addWalletEntity(balance: balance, key: key)
+      if savedWallets.count < ConstantManager.MAX_AMOUNT_STORED_WALLETS {
+        addWalletEntity(balance: balance, key: key)
+      } else {
+        return
+      }
     }
     
     save(container: walletContainer)
-    getWallet()
+    getWallets()
   }
   
   func deleteAll() -> Void {
@@ -90,7 +97,7 @@ class PortfolioDataService {
   
   func reload() -> Void {
     self.getPortfolio()
-    self.getWallet()
+    self.getWallets()
   }
   
   // MARK: Private
@@ -107,11 +114,12 @@ class PortfolioDataService {
     }
   }
   
-  private func getWallet() -> Void {
+  private func getWallets() -> Void {
     let walletRequest = NSFetchRequest<WalletEntity>(entityName: walletEntityName)
     
     do {
-      savedWallet = try walletContainer.viewContext.fetch(walletRequest).first
+      savedWallets = try walletContainer.viewContext.fetch(walletRequest)
+      savedWallet = savedWallets.first(where: { $0.current })
     } catch let error {
       print(NetworkingManager.NetworkingError.badCoreDataResponse(error: error))
     }
@@ -128,14 +136,24 @@ class PortfolioDataService {
   // Wallet
   
   private func updateWalletEntity(entity: WalletEntity, balance: Double, key: String) {
+    savedWallets.forEach { entity in
+      entity.current = false
+    }
+
     entity.balance = balance
     entity.key = key
+    entity.current = true
   }
   
   private func addWalletEntity(balance: Double, key: String) {
+    savedWallets.forEach { entity in
+      entity.current = false
+    }
+
     let entity = WalletEntity(context: walletContainer.viewContext)
     entity.balance = balance
     entity.key = key
+    entity.current = true
   }
   
   // Portfolio

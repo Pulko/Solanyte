@@ -2,9 +2,10 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21C52" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="WalletEntity" representedClassName="WalletEntity" syncable="YES" codeGenerationType="class">
         <attribute name="balance" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="current" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="key" optional="YES" attributeType="String"/>
     </entity>
     <elements>
-        <element name="WalletEntity" positionX="-63" positionY="-18" width="128" height="59"/>
+        <element name="WalletEntity" positionX="-63" positionY="-18" width="128" height="74"/>
     </elements>
 </model>

@@ -11,10 +11,10 @@ import Solana
 struct WalletView: View {
   @Environment(\.presentationMode) var presentationMode
   @EnvironmentObject private var vm: HomeViewModel
-  @StateObject private var portfolioVm = WalletViewModel()
+  @StateObject private var walletVm = WalletViewModel()
   
   private var currentWalletAddress: String {
-    portfolioVm.walletAddress == "" ? vm.walletEntity?.key ?? "" : portfolioVm.walletAddress
+    walletVm.walletAddress == "" ? vm.walletEntity?.key ?? "" : walletVm.walletAddress
   }
   
   var body: some View {
@@ -23,9 +23,20 @@ struct WalletView: View {
         VStack(spacing: 0, content: {
           walletAddressInput
           Spacer()
+          if (!vm.savedWalletEntities.isEmpty) {
+            ForEach(vm.savedWalletEntities) { (wallet: WalletEntity) in
+              Text(wallet.key ?? "")
+                .onTapGesture {
+                  if let key = wallet.key {
+                    walletVm.walletAddress = key
+                  }
+                }
+            }
+          }
+          Spacer()
           CircleButtonView("trash") {
             withAnimation(.spring()) {
-              portfolioVm.deleteAll()
+              walletVm.deleteAll()
               vm.removeData()
               vm.tabView = 1
             }
@@ -43,7 +54,7 @@ extension WalletView {
   private var savePortfolioButton: some View {
     VStack {
       HStack(alignment: .center) {
-        if portfolioVm.isReady {
+        if walletVm.isReady {
           Button(action: {
             saveButtonPressed()
             presentationMode.wrappedValue.dismiss()
@@ -62,58 +73,51 @@ extension WalletView {
   private var walletAddressInput: some View {
     GroupBox {
       VStack {
-        if portfolioVm.isReady || vm.walletEntity?.key != nil {
-          walletDisplayData
-        } else {
-          HStack {
-            Image("solana-logo")
-              .resizable()
-              .scaledToFit()
-              .frame(height: 20)
-              .padding(.trailing, 6)
-            TextField("Solana wallet address", text: $portfolioVm.walletAddress)
-              .textFieldStyle(RoundedBorderTextFieldStyle())
-          }
+        HStack {
+          Image("solana-logo")
+            .resizable()
+            .scaledToFit()
+            .frame(height: 20)
+            .padding(.trailing, 6)
+          TextField("Solana wallet address", text: $walletVm.walletAddress)
+            .textFieldStyle(RoundedBorderTextFieldStyle())
         }
         
         HStack {
-          if portfolioVm.isReady {
+          if walletVm.isReady {
             savePortfolioButton
           } else {
-            if !currentWalletAddress.isEmpty {
+            HStack {
               Button(action: {
-                portfolioVm.fetchWalletByAddress()
+                walletVm.fetchWalletByAddress()
               }, label: {
                 Text("fetch".uppercased())
                   .foregroundColor(.theme.accent)
                   .fontWeight(.bold)
               })
-                .padding()
-            }
-            
-            if currentWalletAddress.isEmpty {
+              
               Button(action: {
                 if UIPasteboard.general.hasStrings {
-                  portfolioVm.walletAddress = UIPasteboard.general.string ?? ""
+                  walletVm.walletAddress = UIPasteboard.general.string ?? ""
                 }
               }, label: {
                 Text("paste".uppercased())
                   .foregroundColor(.theme.accent)
                   .fontWeight(.bold)
               })
-                .padding()
             }
+            .padding()
           }
         }
         
         
-        if (portfolioVm.isError) {
+        if (walletVm.isError) {
           Text("⛔️ Error occured...")
             .foregroundColor(.theme.red)
             .font(.footnote)
         }
         
-        if (portfolioVm.isLoading) {
+        if (walletVm.isLoading) {
           Text("📦 Loading...")
             .foregroundColor(.theme.accent)
             .font(.footnote)
@@ -122,23 +126,10 @@ extension WalletView {
     }
   }
   
-  private var walletDisplayData: some View {
-    VStack {
-      HStack {
-        Text("Wallet address:")
-        Spacer()
-        Text(currentWalletAddress)
-          .frame(width: 100)
-          .lineLimit(1)
-          .truncationMode(.middle)
-      }
-    }
-  }
-  
   /* MARK: OLD EXTENSIONS */
   
   private func saveButtonPressed() {
-    vm.updatePortfolio(coins: portfolioVm.coins)
-    vm.updateWallet(key: portfolioVm.walletAddress, balance: portfolioVm.coins.reduce(0) { $0 + $1.currentHoldingsValue })
+    vm.updatePortfolio(coins: walletVm.coins)
+    vm.updateWallet(key: walletVm.walletAddress, balance: walletVm.coins.reduce(0) { $0 + $1.currentHoldingsValue })
   }
 }
