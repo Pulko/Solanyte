@@ -14,17 +14,15 @@ struct SettingsView: View {
   @State var isBool: Bool = false
   
   var body: some View {
-    NavigationView {
-      VStack {
-        Spacer()
-        
-        settings
-          .padding(.vertical)
-        
-        Spacer()
-      }
-      .padding()
+    VStack {
+      Spacer()
+      
+      settings
+        .padding(.vertical)
+      
+      Spacer()
     }
+    .padding()
   }
 }
 
@@ -58,33 +56,6 @@ extension SettingsView {
           
           Button("Reset") {
             homeVm.resetWalletValue()
-          }
-          .foregroundColor(.theme.red)
-          .padding(.horizontal)
-        }
-      }
-      
-      Divider()
-      
-      VStack {
-        HStack {
-          VStack(alignment: .leading) {
-            Text("Remove wallet")
-              .foregroundColor(.theme.accent)
-              .font(.callout)
-              .padding(.bottom, 3)
-            Text(homeVm.walletEntity?.key ?? "N/A")
-              .frame(width: 100, alignment: .leading)
-              .lineLimit(1)
-              .truncationMode(.middle)
-              .foregroundColor(.theme.secondaryText)
-              .font(.caption)
-          }
-          
-          Spacer()
-          
-          Button("Remove") {
-            homeVm.removeData()
           }
           .foregroundColor(.theme.red)
           .padding(.horizontal)

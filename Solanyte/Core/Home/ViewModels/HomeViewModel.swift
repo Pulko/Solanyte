@@ -52,7 +52,6 @@ class HomeViewModel: ObservableObject {
     portfolioDataService.$savedWallets
       .sink { [weak self] (returnedWallets: [WalletEntity]) in
         self?.savedWalletEntities = returnedWallets
-        print(returnedWallets)
       }
       .store(in: &cancellables)
     
@@ -76,6 +75,11 @@ class HomeViewModel: ObservableObject {
   
   func updateWallet(key: String, balance: Double) {
     portfolioDataService.updateWallet(key: key, balance: balance)
+    self.portfolioValue = balance
+  }
+  
+  func removeWallet(key: String) {
+    portfolioDataService.removeWallet(key: key)
   }
   
   func resetWalletValue() {
@@ -88,14 +92,6 @@ class HomeViewModel: ObservableObject {
     isLoading = true
     portfolioDataService.reload()
     HapticManager.notification(type: .success)
-  }
-  
-  func removeData() {
-    isLoading = true
-    portfolioDataService.deleteAll()
-    HapticManager.notification(type: .success)
-    
-    self.reloadData()
   }
   
   private func filterAndSortCoins(coins: [CoinModel], sort: SortOption, filter: Bool) -> [CoinModel] {

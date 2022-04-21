@@ -11,7 +11,6 @@ struct HomeHeader: View {
   @EnvironmentObject private var vm: HomeViewModel
   @Binding var showInfoView: Bool
   @Binding var showWalletView: Bool
-  @Binding var showRemoveWalletSheet: Bool
   
   private var fromWallet: Bool {
     vm.fromWallet
@@ -147,8 +146,7 @@ struct HomeHeader_Previews: PreviewProvider {
   static var previews: some View {
     HomeHeader(
       showInfoView: .constant(false),
-      showWalletView: .constant(false),
-      showRemoveWalletSheet: .constant(false)
+      showWalletView: .constant(false)
     )
       .environmentObject(dev.homeVM)
       .preferredColorScheme(.dark)

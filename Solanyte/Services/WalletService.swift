@@ -14,22 +14,27 @@ class WalletService {
   
   private let solanaApiService = SolanaApiService()
   private var solanaBalance: Double = 0
+  private var walletsCount: Int = 0
   
-  @Published var wallets: Array<Wallet> = []
   @Published var tokens: Array<TokenData> = []
   @Published var coins: Array<CoinModel> = []
-
-  @Published var walletValue: Double = 0
   
-  init(pubkey: String) {
+  func fetch(pubkey: String) {
+    self.clear()
     self.getWallets(walletPublicKey: pubkey)
     self.getBalance(walletPublicKey: pubkey)
+  }
+  
+  private func clear() -> Void {
+    self.tokens.removeAll()
+    self.coins.removeAll()
+    self.solanaBalance = 0
   }
   
   private func getWallets(walletPublicKey: String) -> Void {
     solanaApiService.actions.getTokenWallets(account: walletPublicKey) { (result: Result<[Wallet], Error>) in
       SolanaApiService.handleResult(result, errorText: "Unable to get wallets from Solana API") { (wallets: [Wallet]) -> Void in
-        self.wallets = wallets
+        self.walletsCount = wallets.count
         self.getTokens(wallets: wallets)
       }
     }
@@ -61,7 +66,7 @@ class WalletService {
   }
   
   func getCoins(tokens: Array<TokenData> = []) -> Void {
-    if tokens.count > 0 {
+    if (tokens.count == self.walletsCount) {
       var ids = tokens.uniqued().compactMap { $0.coingeckoID }.filter { $0 != "" }
       ids.append(CoingeckoApiService.solanaId)
       
@@ -69,28 +74,24 @@ class WalletService {
         models.map { (model: CoinModel) in
           let found = tokens.first(where: { $0.coingeckoID == model.id })
           var amount: Double = 0.0
-
+          
           if (model.id == CoingeckoApiService.solanaId) {
             amount = self.solanaBalance
           } else {
             amount = Double(found?.amount?.uiAmountString ?? "0") ?? 0.0
           }
           
-          self.walletValue += amount
-
           return model.updateHoldings(amount: amount)
         }
       }
       
-      if (tokens.count == self.wallets.count) {
-        CoingeckoApiService.fetchCoinModelsByIds(
-          ids: ids,
-          tryMap: tryMap,
-          receiveValue: { [weak self] coinModels in
-            self?.coins.append(contentsOf: coinModels)
-          })
-          .store(in: &self.cancellables)
-      }
+      CoingeckoApiService.fetchCoinModelsByIds(
+        ids: ids,
+        tryMap: tryMap,
+        receiveValue: { [weak self] coinModels in
+          self?.coins.append(contentsOf: coinModels)
+        })
+        .store(in: &self.cancellables)
     }
   }
 }

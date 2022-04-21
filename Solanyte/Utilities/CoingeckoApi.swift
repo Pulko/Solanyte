@@ -50,7 +50,7 @@ class CoingeckoApiService {
   
   static func fetchCoinModelsByIds(
     ids: Array<String>,
-    tryMap: @escaping ([CoinModel]) -> [CoinModel],
+    tryMap: @escaping ([CoinModel]) -> [CoinModel] = { $0 },
     receiveValue: @escaping ([CoinModel]) -> Void
   ) -> AnyCancellable {
     return NetworkingManager.download(url: url.coinModelsByIds(ids))

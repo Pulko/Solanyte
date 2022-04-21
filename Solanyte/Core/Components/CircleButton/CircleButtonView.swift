@@ -15,6 +15,8 @@ struct CircleButtonView: View {
   var width: Double
   var height: Double
   
+  var color: Color
+  
   var rotate: Bool
   
   init(
@@ -23,6 +25,7 @@ struct CircleButtonView: View {
     width: Double = 50,
     height: Double = 50,
     rotate: Bool = false,
+    color: Color = Color.theme.accent,
     action: @escaping (() -> Void) = {}
   ) {
     self.systemName = systemName
@@ -31,6 +34,7 @@ struct CircleButtonView: View {
     self.width = width
     self.height = height
     self.rotate = rotate
+    self.color = color
   }
   
   private func imageElement() -> some View {
@@ -48,7 +52,7 @@ struct CircleButtonView: View {
       imageElement()
         .frame(width: width / 2, height: height / 2, alignment: .center)
         .rotationEffect(Angle.degrees(rotate ? 360 : 0), anchor: .center)
-        .foregroundColor(.theme.accent)
+        .foregroundColor(color)
         .font(.headline)
     }
   }

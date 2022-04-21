@@ -46,21 +46,11 @@ class PortfolioDataService {
     self.getWallets()
   }
   
-  // MARK: Public  
+  // MARK: Public
   func updatePortfolio(coins: [CoinModel]) {
-    coins.forEach { coin in
-      let amount = coin.currentHoldings ?? 0.0
-
-      if let entity = savedEntities.first(where: { $0.coinID == coin.id }) {
-        if amount > 0 {
-          updatePortfolioEntity(entity: entity, amount: amount)
-        } else {
-          deletePortfolioEntity(entity: entity)
-        }
-      } else {
-        addPortfolioEntity(coin: coin, amount: amount)
-      }
-    }
+    deleteSavedEntities()
+    
+    coins.forEach { addPortfolioEntity(coin: $0, amount: $0.currentHoldings ?? 0.0) }
     
     save(container: container)
     getPortfolio()
@@ -83,16 +73,19 @@ class PortfolioDataService {
     getWallets()
   }
   
-  func deleteAll() -> Void {
-    savedEntities.forEach { container.viewContext.delete($0) }
-    if let walletEntity = savedWallet {
-      walletContainer.viewContext.delete(walletEntity)
+  func removeWallet(key: String) -> Void {
+    if let entity = savedWallets.first(where: { $0.key == key }) {
+      walletContainer.viewContext.delete(entity)
+      
+      if entity.current {
+        self.savedCoins.removeAll()
+        self.fromWallet = false
+        deleteSavedEntities()
+      }
     }
-    fromWallet = false
-    savedEntities.removeAll()
-    savedCoins.removeAll()
-    self.save(container: container)
+    
     self.save(container: walletContainer)
+    getWallets()
   }
   
   func reload() -> Void {
@@ -139,7 +132,7 @@ class PortfolioDataService {
     savedWallets.forEach { entity in
       entity.current = false
     }
-
+    
     entity.balance = balance
     entity.key = key
     entity.current = true
@@ -149,7 +142,7 @@ class PortfolioDataService {
     savedWallets.forEach { entity in
       entity.current = false
     }
-
+    
     let entity = WalletEntity(context: walletContainer.viewContext)
     entity.balance = balance
     entity.key = key
@@ -166,14 +159,9 @@ class PortfolioDataService {
     save(container: container)
   }
   
-  private func updatePortfolioEntity(entity: PortfolioEntity, amount: Double) {
-    entity.amount = amount
-
-    save(container: container)
-  }
-  
-  private func deletePortfolioEntity(entity: PortfolioEntity) {
-    container.viewContext.delete(entity)
+  private func deleteSavedEntities() -> Void {
+    savedEntities.forEach { container.viewContext.delete($0) }
+    savedEntities.removeAll()
     
     save(container: container)
   }
@@ -182,9 +170,10 @@ class PortfolioDataService {
   
   private func handleSavedEntities() -> Void {
     let ids = self.savedEntities.compactMap { $0.coinID }.uniqued().filter { $0 != "" }
-
+    
     if (!ids.isEmpty) {
       fromWallet = !ids.isEmpty
+      
       let tryMap = { (models: [CoinModel]) -> [CoinModel] in
         models.map { (model: CoinModel) in
           let amount = self.savedEntities.first(where: { $0.coinID == model.id })?.amount ?? 0

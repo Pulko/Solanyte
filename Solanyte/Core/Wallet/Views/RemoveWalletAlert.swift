@@ -12,8 +12,10 @@ struct RemoveWalletAlert: View {
   
   @Binding var showRemoveWalletSheet: Bool
   
+  var key: String
+  
   private var title: Text {
-    Text("Stop tracking this wallet")
+    Text("Forget this wallet")
   }
   
   private var message: Text {
@@ -28,7 +30,7 @@ struct RemoveWalletAlert: View {
   
   private func destructiveHandler() -> Void {
     withAnimation {
-      vm.removeData()
+      vm.removeWallet(key: key)
     }
   }
   
@@ -64,6 +66,6 @@ struct RemoveWalletAlert: View {
 
 struct RemoveWalletAlert_Previews: PreviewProvider {
   static var previews: some View {
-    RemoveWalletAlert(showRemoveWalletSheet: .constant(false))
+    RemoveWalletAlert(showRemoveWalletSheet: .constant(false), key: "")
   }
 }

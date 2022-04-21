@@ -12,7 +12,6 @@ struct HomeView: View {
   
   @State private var showWalletView: Bool = false
   @State private var showInfoView: Bool = false
-  @State private var showRemoveWalletSheet: Bool = false
   
   private var isContent: Bool {
     coinsToRender.count > 0
@@ -35,15 +34,13 @@ struct HomeView: View {
           ScrollView {
             HomeHeader(
               showInfoView: $showInfoView,
-              showWalletView: $showWalletView,
-              showRemoveWalletSheet: $showRemoveWalletSheet
+              showWalletView: $showWalletView
             )
               .padding(.top)
             
             if isContent {
               columnTitles
               coinsList
-                .padding(.bottom)
             }
             
             if !isContent {
@@ -58,7 +55,6 @@ struct HomeView: View {
             }
             
             Spacer(minLength: 0)
-            RemoveWalletAlert(showRemoveWalletSheet: $showRemoveWalletSheet)
           }
           .transition(.move(edge: .leading))
         }
