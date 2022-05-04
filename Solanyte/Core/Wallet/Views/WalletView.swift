@@ -124,35 +124,12 @@ extension WalletView {
   private var walletsList: some View {
     ScrollView {
       ForEach(vm.savedWalletEntities) { (wallet: WalletEntity) in
-        HStack {
-          Text(wallet.key ?? "")
-            .foregroundColor(.theme.accent)
-            .frame(width: 150)
-            .lineLimit(1)
-            .truncationMode(.middle)
-            .padding(.horizontal)
-          
-          Spacer()
-          
-          if (wallet.current) {
-            CircleButtonView("checkmark", color: .theme.green.opacity(0.8))
-              .disabled(true)
-          } else {
-            CircleButtonView(
-              "square.and.arrow.down",
-              color: walletVm.isReady ? .theme.accent.opacity(0.3) : .theme.accent
-            ) {
-              if let key = wallet.key {
-                walletVm.walletAddress = key
-              }
-            }
-            .disabled(walletVm.isReady)
-          }
-          
-          CircleButtonView(
-            "trash",
-            color: walletVm.isReady ? .theme.red.opacity(0.3) : .theme.red
-          ) {
+        WalletRowView(
+          current: wallet.current,
+          key: wallet.key ?? "",
+          onLoadDisabled: walletVm.isReady,
+          onRemoveDisabled: walletVm.isReady,
+          onRemove: {
             if let key = wallet.key {
               withAnimation(.spring()) {
                 walletToRemove = key
@@ -160,9 +137,11 @@ extension WalletView {
               }
             }
           }
-          .disabled(walletVm.isReady)
+        ) {
+          if let key = wallet.key {
+            walletVm.walletAddress = key
+          }
         }
-        .padding(.vertical, 6)
       }
     }
   }

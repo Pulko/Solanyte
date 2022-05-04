@@ -31,6 +31,7 @@ class CoingeckoApiService {
   
   static var url = CoingeckoUrl()
   static var solanaId = "solana"
+  static var solanaMintAddress = "So11111111111111111111111111111111111111112"
   
   static func fetchCoinDetailById(
     id: String,

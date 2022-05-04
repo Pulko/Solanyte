@@ -77,9 +77,7 @@ extension HomeView {
       GroupBox {
         NavigationLink(
           destination: NavigationLazyView(DetailView(coin: coin)),
-          label: {
-            CoinRowView(coin: coin, showHoldings: true)
-          }
+          label: { CoinRowView(coin: coin, showHoldings: true) }
         )
           .listRowBackground(Color.theme.background)
           .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))

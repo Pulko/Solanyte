@@ -57,7 +57,7 @@ class WalletService {
           SolscanApiService.fetchTokenDataByMint(
             mint: mint,
             receiveValue: { [weak self] tokenData in
-              self?.tokens.append(tokenData.assignAmount(amount: wallet.ammount))
+              self?.tokens.append(tokenData.assignAmountAndMintAddress(amount: wallet.ammount, mintAddress: address))
             })
             .store(in: &self.cancellables)
         }
@@ -74,14 +74,17 @@ class WalletService {
         models.map { (model: CoinModel) in
           let found = tokens.first(where: { $0.coingeckoID == model.id })
           var amount: Double = 0.0
+          var mint: String = ""
           
           if (model.id == CoingeckoApiService.solanaId) {
             amount = self.solanaBalance
+            mint = CoingeckoApiService.solanaMintAddress
           } else {
             amount = Double(found?.amount?.uiAmountString ?? "0") ?? 0.0
+            mint = found?.mintAddress ?? ""
           }
           
-          return model.updateHoldings(amount: amount)
+          return model.updateHoldingsAndMintAddress(currentHoldings: amount, mintAddress: mint)
         }
       }
       

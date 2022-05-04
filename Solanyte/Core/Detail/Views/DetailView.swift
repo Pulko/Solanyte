@@ -10,8 +10,10 @@ import SwiftUI
 
 struct DetailView: View {
   @StateObject private var vm: DetailViewModel
+  @EnvironmentObject private var homeVm: HomeViewModel
   
   @State private var showFullDescription: Bool = false
+  @State private var showAllHolders: Bool = false
   
   init(coin: CoinModel) {
     _vm = StateObject(wrappedValue: DetailViewModel(coin: coin))
@@ -28,6 +30,8 @@ struct DetailView: View {
       
       VStack(spacing: 20) {
         statisticSection
+        
+        holdersSection
         
         descriptionSection
         
@@ -59,6 +63,55 @@ extension DetailView {
       GridItem(.flexible()),
       GridItem(.flexible())
     ]
+  }
+  
+  private func renderWalletRow(owner: String) -> some View {
+    let found = homeVm.savedWalletEntities.first {
+      if let key = $0.key {
+        return key == owner
+      }
+      
+      return false
+    }
+    
+    if found != nil {
+      return WalletRowView(current: true, key: owner)
+    } else {
+      return WalletRowView(key: owner, onLoad: {
+        withAnimation(.spring()) {
+          homeVm.updateWallet(key: owner, balance: 0.0, current: false)
+        }
+      })
+    }
+  }
+  
+  private var holdersSection: some View {
+    VStack(alignment: .leading) {
+      if (!vm.tokenHolders.isEmpty) {
+        Text("Top holders")
+          .font(.callout)
+          .foregroundColor(.theme.accent)
+          .frame(maxWidth: .infinity, alignment: .leading)
+        ForEach(vm.tokenHolders.dropLast(showAllHolders ? 0 : 8), id: \.address) { holder in
+          renderWalletRow(owner: holder.owner)
+        }
+        
+        readMoreButton(readMore: showAllHolders) {
+          withAnimation(.easeInOut) {
+            showAllHolders.toggle()
+          }
+        }
+      }
+    }
+  }
+  
+  private func readMoreButton(readMore: Bool, action: @escaping () -> Void) -> some View {
+    Button(action: action, label: {
+      Text(readMore ? "Read less" : "Read more")
+        .font(.caption)
+        .foregroundColor(.theme.accent)
+        .padding(.vertical, 4)
+    })
   }
   
   private var statisticSection: some View {
@@ -116,16 +169,11 @@ extension DetailView {
             .foregroundColor(.theme.secondaryText)
             .frame(maxWidth: .infinity, alignment: .leading)
           
-          Button(action: {
+          readMoreButton(readMore: showFullDescription) {
             withAnimation(.easeInOut) {
               showFullDescription.toggle()
             }
-          }, label: {
-            Text(showFullDescription ? "Read less" : "Read more")
-              .font(.caption)
-              .foregroundColor(.theme.accent)
-              .padding(.vertical, 4)
-          })
+          }
         }
         .padding(.top)
       }

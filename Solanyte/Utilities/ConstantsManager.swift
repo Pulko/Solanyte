@@ -8,5 +8,5 @@
 import Foundation
 
 struct ConstantManager {
-  static var MAX_AMOUNT_STORED_WALLETS = 3
+  static var MAX_AMOUNT_STORED_WALLETS = 5
 }

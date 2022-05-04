@@ -38,6 +38,7 @@ class CoinModel: Identifiable, Codable {
   var sparklineIn7D: SparklineIn7D? = nil
   var priceChangePercentage24HInCurrency: Double? = 0
   var currentHoldings: Double? = 0
+  var mintAddress: String? = ""
   
   init(
     id: String,
@@ -67,7 +68,8 @@ class CoinModel: Identifiable, Codable {
     lastUpdated: String? = nil,
     sparklineIn7D: SparklineIn7D? = nil,
     priceChangePercentage24HInCurrency: Double? = nil,
-    currentHoldings: Double? = nil
+    currentHoldings: Double? = nil,
+    mintAddress: String? = nil
   ) {
     self.id = id
     self.symbol = symbol
@@ -97,6 +99,7 @@ class CoinModel: Identifiable, Codable {
     self.sparklineIn7D = sparklineIn7D
     self.priceChangePercentage24HInCurrency = priceChangePercentage24HInCurrency
     self.currentHoldings = currentHoldings
+    self.mintAddress = mintAddress
   }
   
   init(coinDetailModel cdm: CoinDetailModel, currentHoldings: Double? = 0) {
@@ -160,6 +163,10 @@ class CoinModel: Identifiable, Codable {
   
   func updateHoldings (amount: Double) -> CoinModel {
     return CoinModel(id: id, symbol: symbol, name: name, image: image, currentPrice: currentPrice, marketCap: marketCap, marketCapRank: marketCapRank, fullyDilutedValuation: fullyDilutedValuation, totalVolume: totalVolume, high24H: high24H, low24H: low24H, priceChange24H: priceChange24H, priceChangePercentage24H: priceChangePercentage24H, marketCapChange24H: marketCapChange24H, marketCapChangePercentage24H: marketCapChangePercentage24H, circulatingSupply: circulatingSupply, totalSupply: totalSupply, maxSupply: maxSupply, ath: ath, athChangePercentage: athChangePercentage, athDate: athDate, atl: atl, atlChangePercentage: atlChangePercentage, atlDate: atlDate, lastUpdated: lastUpdated, sparklineIn7D: sparklineIn7D, priceChangePercentage24HInCurrency: priceChangePercentage24HInCurrency, currentHoldings: amount)
+  }
+  
+  func updateHoldingsAndMintAddress(currentHoldings: Double, mintAddress: String?) -> CoinModel {
+    return CoinModel(id: id, symbol: symbol, name: name, image: image, currentPrice: currentPrice, marketCap: marketCap, marketCapRank: marketCapRank, fullyDilutedValuation: fullyDilutedValuation, totalVolume: totalVolume, high24H: high24H, low24H: low24H, priceChange24H: priceChange24H, priceChangePercentage24H: priceChangePercentage24H, marketCapChange24H: marketCapChange24H, marketCapChangePercentage24H: marketCapChangePercentage24H, circulatingSupply: circulatingSupply, totalSupply: totalSupply, maxSupply: maxSupply, ath: ath, athChangePercentage: athChangePercentage, athDate: athDate, atl: atl, atlChangePercentage: atlChangePercentage, atlDate: atlDate, lastUpdated: lastUpdated, sparklineIn7D: sparklineIn7D, priceChangePercentage24HInCurrency: priceChangePercentage24HInCurrency, currentHoldings: currentHoldings, mintAddress: mintAddress)
   }
   
   var currentHoldingsValue: Double {

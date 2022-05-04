@@ -56,14 +56,14 @@ class PortfolioDataService {
     getPortfolio()
   }
   
-  func updateWallet(key: String, balance: Double = 0) {
+  func updateWallet(key: String, balance: Double = 0, current: Bool = true) {
     let existingEntity = savedWallets.first { $0.key == key }
     
     if let entity = existingEntity {
       updateWalletEntity(entity: entity, balance: balance, key: key)
     } else {
       if savedWallets.count < ConstantManager.MAX_AMOUNT_STORED_WALLETS {
-        addWalletEntity(balance: balance, key: key)
+        addWalletEntity(balance: balance, key: key, current: current)
       } else {
         return
       }
@@ -138,15 +138,20 @@ class PortfolioDataService {
     entity.current = true
   }
   
-  private func addWalletEntity(balance: Double, key: String) {
-    savedWallets.forEach { entity in
-      entity.current = false
+  private func addWalletEntity(balance: Double, key: String, current: Bool = true) {
+    if current {
+      savedWallets.forEach { entity in
+        entity.current = false
+      }
     }
     
     let entity = WalletEntity(context: walletContainer.viewContext)
     entity.balance = balance
     entity.key = key
-    entity.current = true
+    
+    if current {
+      entity.current = true
+    }
   }
   
   // Portfolio
@@ -155,6 +160,7 @@ class PortfolioDataService {
     let entity = PortfolioEntity(context: container.viewContext)
     entity.coinID = coin.id
     entity.amount = amount
+    entity.mint = coin.mintAddress
     
     save(container: container)
   }
@@ -177,8 +183,9 @@ class PortfolioDataService {
       let tryMap = { (models: [CoinModel]) -> [CoinModel] in
         models.map { (model: CoinModel) in
           let amount = self.savedEntities.first(where: { $0.coinID == model.id })?.amount ?? 0
+          let mint = self.savedEntities.first(where: { $0.coinID == model.id })?.mint ?? ""
           
-          return model.updateHoldings(amount: amount)
+          return model.updateHoldingsAndMintAddress(currentHoldings: amount, mintAddress: mint)
         }
       }
       

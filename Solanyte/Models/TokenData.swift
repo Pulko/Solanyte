@@ -16,6 +16,7 @@ struct TokenData: Codable, Hashable {
   let coingeckoID: String?
   let holder: Int?
   var amount: TokenAmount?
+  var mintAddress: String?
   
   enum CodingKeys: String, CodingKey {
     case symbol, name, icon, website, twitter, decimals
@@ -32,7 +33,8 @@ struct TokenData: Codable, Hashable {
     decimals: Int?,
     coingeckoID: String?,
     holder: Int?,
-    amount: TokenAmount?
+    amount: TokenAmount?,
+    mintAddress: String? = ""
   ) {
     self.symbol = symbol
     self.name = name
@@ -43,9 +45,10 @@ struct TokenData: Codable, Hashable {
     self.holder = holder
     self.coingeckoID = coingeckoID
     self.amount = amount
+    self.mintAddress = mintAddress
   }
   
-  func assignAmount(amount: TokenAmount?) -> TokenData {
-    return TokenData(symbol: symbol, name: name, icon: icon, website: website, twitter: twitter, decimals: decimals, coingeckoID: coingeckoID, holder: holder, amount: amount)
+  func assignAmountAndMintAddress(amount: TokenAmount?, mintAddress: String) -> TokenData {
+    return TokenData(symbol: symbol, name: name, icon: icon, website: website, twitter: twitter, decimals: decimals, coingeckoID: coingeckoID, holder: holder, amount: amount, mintAddress: mintAddress)
   }
 }

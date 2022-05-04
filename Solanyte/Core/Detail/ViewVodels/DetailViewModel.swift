@@ -14,6 +14,7 @@ class DetailViewModel: ObservableObject {
   @Published var coinDescription: String? = nil
   @Published var websiteUrl: String? = nil
   @Published var redditUrl: String? = nil
+  @Published var tokenHolders: Array<HolderData> = []
   
   @Published var chart: SparklineIn7D? = nil
   @Published var lastUpdated: String = ""
@@ -45,6 +46,12 @@ class DetailViewModel: ObservableObject {
         self.websiteUrl = details.links?.homepage?.first
         self.chart = SparklineIn7D(price: details.marketData.sparkline7D?.price)
         self.lastUpdated = details.marketData.lastUpdated ?? ""
+      }
+      .store(in: &cancellables)
+    
+    coinDetailsDataService.$tokenHolders
+      .sink { [weak self] returnedTokenHolders in
+        self?.tokenHolders = returnedTokenHolders ?? []
       }
       .store(in: &cancellables)
   }
