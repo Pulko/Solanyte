@@ -15,3 +15,28 @@ A mobile wallet tracking application for iOS.
 - Solana
 - Coingecko
 - Solscan
+
+
+## Roadmap
+- [x] finish design of add wallet
+- [x] finish design of setting menu
+- [x] add Solscan branding
+- [x] add Solana branding
+- [x] add remove all core data banner
+- [x] show stats of portfolio on main screen
+- [x] adjust wallet reconnection
+- [x] add toggle to hide zero-balances
+- [x] store wallet address or multiple
+- [x] fetch no-portfolio-coins after removing a wallet
+- [x] pop up to accept removing wallet
+- [x] add tabs
+- [x] add possibility of multiple wallets (mb add new field to wallet entity and store coin gecko IDs there along with token addresses, and make wallets multiple, lets say up to 3 wallets)
+- [x] get holders for each coin
+- [x] redefine view models and services for new architecture
+- [x] change portfolio data service to store multiple wallets
+- [ ] add error handling
+- [ ] check if api responds (if no - show error)
+- [ ] add create wallet link in portfolio view
+- [ ] track transactions ?
+- [ ] tests
+- [ ] other devices' widgets
